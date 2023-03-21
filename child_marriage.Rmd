@@ -1,0 +1,64 @@
+---
+title: "child_marriage"
+author: "Ambalika"
+date: "2023-03-20"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+
+library(tidyverse)
+library(naniar)
+library(plotly)
+library(janitor)
+library(readr)
+library(ggplot2)
+library(dplyr)
+library(gganimate)
+library(sf)
+library(rnaturalearthdata)
+library(readxl)
+library(viridis)
+
+```
+
+```{r}
+
+cm_2021 <- read_excel("data/child_marriage/cm_2021.xlsx")
+
+cm_women_18 <- cm_2021 %>% 
+  select(Country, w15) %>% 
+  mutate(w15 = as.numeric(w15)) %>% 
+  na.omit()
+
+countries <- ne_countries(returnclass = "sf", scale = "medium")
+cm_w15 <- ne_countries(returnclass = "sf", scale = "medium") %>% 
+  select(admin) %>% 
+  left_join(cm_women_18, by = c("admin" = "Country"))
+
+
+ggplotly(ggplot()+
+  geom_sf(countries, mapping = aes(fill = NA)) +
+  geom_sf(cm_w15 , mapping = aes(fill = as.factor(w15), text = admin)) +
+  theme(legend.position="none") + 
+  labs(title = "Child Marriage Rate for women below 15 yrs"))
+
+
+```
+
+```{r}
+
+```
+
+
+
+
+
+
+
+
+
