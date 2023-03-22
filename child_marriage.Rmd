@@ -178,14 +178,44 @@ ggplotly(ggplot()  +
   geom_sf(law_support , mapping = aes(fill = as.factor(Law), text = Entity)) + 
   labs(title = "Whether Law Prohibits Child Marriage/Early Marriage"))
 
-
 ```
 
 
 
+```{r}
+
+primary <- read_csv("data/child_marriage/Primary.csv")
+
+primary <- pivot_longer(
+  primary, cols = c("2010":"2021"),
+  names_to = "Year",
+             values_to = "Rate") %>%
+  mutate(Year = as.integer(Year)) 
+
+primary <- primary %>% 
+  filter(rate < 100) %>% 
+  clean_names()
+
+Jointable <- ne_countries(returnclass = "sf", scale = "medium") %>% 
+  select(iso_a3) %>% 
+  right_join(primary, by = c("iso_a3" = "country_code"))
+
+emp_map  <- ggplot()+
+  geom_sf(data = countries, fill = NA)+
+  geom_sf(data = Jointable , 
+          mapping = aes(fill = rate))+
+  scale_fill_viridis(na.value="white")+
+  labs(title = "Primary completion rate, total (% of relevant age group)",
+       subtitle = "Year: {current_frame}",
+       fill = "rate")+
+  transition_manual(year) 
+
+final_map <- animate(emp_map, duration = 10, fps = 3, width = 1000, height = 500, renderer = gifski_renderer())
+
+final_map
 
 
-
+```
 
 
 
