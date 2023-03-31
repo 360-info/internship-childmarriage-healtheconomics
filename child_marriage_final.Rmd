@@ -1,0 +1,108 @@
+---
+title: "child_marriage"
+author: "Ambalika"
+date: "2023-03-30"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r package}
+
+library(readr)
+library(tidyverse)
+library(janitor)
+library(plotly)
+library(ggplot2)
+library(gganimate)
+library(sf)
+library(rnaturalearthdata)
+library(rnaturalearth)
+library(readxl)
+library(viridis)
+library(gifski)
+library(ggpattern)
+library(colorspace)
+library(themes360info)
+
+```
+
+
+```{r}
+
+w_18 <- read_csv("data/child_marriage/w_18.csv")
+
+w_18 <- w_18 %>% 
+  select(geoAreaCode, geoAreaName, parentCode, parentName, ISO3, latest_value)
+
+law_2 <- read_csv("data/child_marriage/law_2.csv")
+
+cmf <- law_2 %>% 
+  left_join(w_18, by = c("Code" = "ISO3"))
+
+countries <- ne_countries(returnclass = "sf", scale = "medium")
+
+cmf1 <- countries %>% 
+  select(iso_a3) %>% 
+  left_join(cmf, by = c("iso_a3" = "Code")) %>% 
+  drop_na(Law)
+
+
+```
+
+
+```{r}
+
+ggplot() +
+  geom_sf(cm_final , mapping = aes(fill = latest_value)) + 
+  labs(title = "Legal provisions for child marriage", caption = "Categories coded as: \n 0 = marriage prohibited under 18 without exceptions; \n 0.25 = marriage prohibited under 18 without exceptions, \n but some customary or traditional laws encourage girl marriage; \n 0.5 = marriage prohibited under 18 \n but there are legal exceptions regarding consent and/or some groups of women; \n 0.75 = marriage allowed under 18 for boys and girls; \n 1 = marriage allowed under 18 for girls but not boys.") +
+    scale_fill_viridis_c(option = "viridis", name = "Legal Laws") +
+  theme(plot.caption.position = "plot",
+        plot.caption = element_text(hjust = 0)) + theme_360()
+
+```
+
+
+```{r}
+
+ggplot() +
+  geom_sf(data = cmf1, 
+          mapping = aes(fill = latest_value)) +
+  geom_sf_pattern(
+    data = cmf1,
+    mapping = aes(Law),
+    stat = "sf",
+    position = "identity",
+    pattern = 'polygon_tiling',
+    pattern_type = Law,
+    pattern_fill = Law,
+    pattern_key_scale_factor = 1.2
+    ) +
+  scale_pattern_type_manual(values=c('stripe', 'rhombille', 'satin', 'crosshatch', 'point')) +
+  labs(title = "Child Marriage Rate 2005 - 2020")
+
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
