@@ -23,6 +23,8 @@ library(rnaturalearth)
 library(readxl)
 library(viridis)
 library(gifski)
+library(ggpattern)
+library(colorspace)
 library(themes360info)
 
 ```
@@ -364,10 +366,16 @@ combined_map <- ggplot() +
       "**CHART::** Ambalika Gupta & James Goldie, 360info",
       "**DATA::** World Bank",
       sep = "<br>")) +
-  #coord_sf(crs = "ESRI:54012") +
-  theme_360()
-
-ggsave("combined_map.png", combined_map)
+  #coord_sf(crs = "ESRI:54012") 
+ggsave(
+  "chart_test.png" ,
+  plot = combined_map,
+  scale = 0.9,
+  width = 20,
+  height = 10,
+  units = "cm",
+  dpi=320
+)
 
 ```
 
