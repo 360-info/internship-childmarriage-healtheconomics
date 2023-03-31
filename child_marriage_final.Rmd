@@ -29,7 +29,6 @@ library(themes360info)
 
 ```
 
-
 ```{r}
 
 w_18 <- read_csv("data/child_marriage/w_18.csv")
@@ -49,60 +48,52 @@ cmf1 <- countries %>%
   left_join(cmf, by = c("iso_a3" = "Code")) %>% 
   drop_na(Law)
 
+cmf1 %>%
+  mutate(
+    LawStr = case_when(
+      Law == 0 ~ "Prohibited",
+      Law == 0.25 ~ "Prohibited with legal exceptions",
+      Law == 0.5 ~  "Prohibited with legal exceptions for girls",
+      Law == 0.75 ~ "Allowed",
+      Law == 1 ~ "Allowed for girls")) ->
+  cmf1
+
 
 ```
 
 
 ```{r}
-
-ggplot() +
-  geom_sf(cm_final , mapping = aes(fill = latest_value)) + 
-  labs(title = "Legal provisions for child marriage", caption = "Categories coded as: \n 0 = marriage prohibited under 18 without exceptions; \n 0.25 = marriage prohibited under 18 without exceptions, \n but some customary or traditional laws encourage girl marriage; \n 0.5 = marriage prohibited under 18 \n but there are legal exceptions regarding consent and/or some groups of women; \n 0.75 = marriage allowed under 18 for boys and girls; \n 1 = marriage allowed under 18 for girls but not boys.") +
-    scale_fill_viridis_c(option = "viridis", name = "Legal Laws") +
-  theme(plot.caption.position = "plot",
-        plot.caption = element_text(hjust = 0)) + theme_360()
-
-```
-
-
-```{r}
-
-ggplot() +
-  geom_sf(data = cmf1, 
-          mapping = aes(fill = latest_value)) +
-  geom_sf_pattern(
+rate_map <- ggplot() +
+ geom_sf(data = countries, fill = "grey", colour = "black") +
+  geom_sf(
+    mapping = aes(fill = latest_value),
     data = cmf1,
-    mapping = aes(Law),
     stat = "sf",
     position = "identity",
-    pattern = 'polygon_tiling',
-    pattern_type = Law,
-    pattern_fill = Law,
-    pattern_key_scale_factor = 1.2
+    colour = "black",
+    expand = TRUE
     ) +
-  scale_pattern_type_manual(values=c('stripe', 'rhombille', 'satin', 'crosshatch', 'point')) +
-  labs(title = "Child Marriage Rate 2005 - 2020")
+  scale_fill_fermenter(
+    name = NULL,
+    palette = "YlOrBr",
+    direction = 1,
+    labels = scales::label_number(suffix = "%"),
+    na.value = "grey") + 
+  labs(
+    title = "CHILD MARRIAGE",
+    subtitle = "% women aged 20-24 married before 18 (average 2005-2020)",
+    caption = paste(
+      "**CHART:** Ambalika Gupta & James Goldie, 360info",
+      "**DATA:** UNStats",
+      sep = "<br>")) +
+  #coord_sf(crs = "ESRI:54012") +
+  theme_360() +
+  theme(
+    legend.position = "top",
+    legend.direction = "horizontal",
+    legend.key.width = unit(2, "cm"),
+    panel.grid = element_blank()
+  )
 
-
-
-
+save_360plot(rate_map, "rate_map.png", retina = 4, shape = "sdtv-landscape")
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
