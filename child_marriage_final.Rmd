@@ -99,6 +99,55 @@ save_360plot(rate_map, "rate_map.png", retina = 4, shape = "sdtv-landscape")
 
 ```
 
+### Final Chloropleth + Pattern Map with save option
+
+```{r}
+
+combined_map <- ggplot() +
+  geom_sf(data = countries,
+          mapping = aes(fill = NULL)) +
+  geom_sf_pattern(
+    mapping = aes(
+      pattern_spacing = LawStr,
+      pattern_density = LawStr,
+      pattern_angle   = LawStr,
+      pattern         = LawStr,
+      fill = latest_value
+    ),
+    data = cmf1,
+    stat = "sf",
+    position = "identity",
+    colour = "black",
+    #pattern = 'stripe',
+    pattern_aspect_ratio = 1.8,
+    pattern_fill = "black",
+    pattern_alpha = 0.4
+  ) +
+  scale_pattern_density_discrete(range = c(0.01, 0.3)) +
+  scale_pattern_spacing_discrete(range = c(0.01, 0.03)) +
+  scale_fill_fermenter(name = "Child Marriage Rate", palette = "YlOrBr", direction = 1) +
+  labs(
+    title = "CHILD MARRIAGE",
+    subtitle = "Average child marriage rate (2005-2020) and legality",
+    caption = paste(
+      "**CHART::** Ambalika Gupta & James Goldie, 360info",
+      "**DATA::** World Bank",
+      sep = "<br>"
+    )
+  ) 
+  
+ggsave(
+  "chart_test.png" ,
+  plot = combined_map,
+  scale = 0.9,
+  width = 20,
+  height = 10,
+  units = "cm",
+  dpi = 320
+)
+
+```
+
 
 ### Plot 2: Avg Child Marriage Rate in Sub Continental Region during Covid-19
 
@@ -135,9 +184,6 @@ ggplot(data = child_covid, aes(
   xlab("Child Marriage Rate") +
   ylab("Region") +
   theme_360()
-
-
-
 
 ```
 

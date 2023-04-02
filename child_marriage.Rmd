@@ -395,7 +395,7 @@ ggplot() +
 
 ```
 
-### Final Pattern Map
+### Final Pattern Map with save option
 
 ```{r}
 
@@ -421,7 +421,7 @@ combined_map <- ggplot() +
   ) +
   scale_pattern_density_discrete(range = c(0.01, 0.3)) +
   scale_pattern_spacing_discrete(range = c(0.01, 0.03)) +
-  scale_fill_fermenter(name = "Child Marriage Rate") +
+  scale_fill_fermenter(name = "Child Marriage Rate", palette = "YlOrBr", direction = 1) +
   labs(
     title = "CHILD MARRIAGE",
     subtitle = "Average child marriage rate (2005-2020) and legality",
@@ -432,15 +432,15 @@ combined_map <- ggplot() +
     )
   ) 
   
-  ggsave(
-    "chart_test.png" ,
-    plot = combined_map,
-    scale = 0.9,
-    width = 20,
-    height = 10,
-    units = "cm",
-    dpi = 320
-  )
+ggsave(
+  "chart_test.png" ,
+  plot = combined_map,
+  scale = 0.9,
+  width = 20,
+  height = 10,
+  units = "cm",
+  dpi = 320
+)
 
 ```
 
