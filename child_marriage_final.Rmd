@@ -19,6 +19,7 @@ library(ggplot2)
 library(sf)
 library(rnaturalearthdata)
 library(rnaturalearth)
+library(ggpattern)
 library(colorspace)
 library(themes360info)
 
@@ -86,7 +87,6 @@ rate_map <- ggplot() +
       "**CHART:** Ambalika Gupta & James Goldie, 360info",
       "**DATA:** UNStats",
       sep = "<br>")) +
-  #coord_sf(crs = "ESRI:54012") +
   theme_360() +
   theme(
     legend.position = "top",
