@@ -9,6 +9,8 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+# Packages used
+
 ```{r}
 
 library(readr)
@@ -29,9 +31,9 @@ library(themes360info)
 
 ```
 
+### Plot 1 : Covid-19 Stringency
 
-
-```{r}
+```{r covid}
 
 stringency <- read_excel("data/child_marriage/stringency.xlsx")
 
@@ -50,14 +52,15 @@ covid <- ne_countries(returnclass = "sf", scale = "medium") %>%
 ggplotly(ggplot()+
   geom_sf(covid , mapping = aes(fill = value, text = admin)) + 
     scale_fill_viridis_c(option = "viridis") +
-  labs(title = "Covid-19 Stringency"))
+    labs(title = "Covid-19 Stringency"))
 
 
 ```
 
 
-```{r}
+### Plot 2: Child Marriage rate - Women vs Men below 18 years - 2021
 
+```{r gender}
 
 cm_2021_new <- read_excel("data/child_marriage/cm_2021_new.xlsx")
 
@@ -73,19 +76,25 @@ cm_2021_new <- cm_2021_new %>%
 
 str(cm_2021_new)
 
-ggplotly(ggplot(cm_2021_new, aes(x=w18, y=m18, size=Population, color=Region, text = Country)) +
-                 geom_point(alpha=0.5) +
-                 scale_size(range = c(.1, 24), name="Population (M)") +
-                 ylab("Men below 18 years of age") +
-                 xlab("Women below 18 years of age") +
-                 labs(title  = "Child Marriage rate - Women vs Men below 18 years - 2021") +
-                 scale_y_continuous(labels = scales::label_percent(scale = 1)) +
-  scale_x_continuous(labels = scales::label_percent(scale = 1)))
+ggplotly(
+  ggplot(cm_2021_new, aes(x=w18, 
+                          y=m18, 
+                          size=Population, 
+                          color=Region, 
+                          text = Country)) +
+    geom_point(alpha=0.5) +
+    scale_size(range = c(.1, 24), name="Population (M)") +
+    ylab("Men below 18 years of age") +
+    xlab("Women below 18 years of age") +
+    labs(title  = "Child Marriage rate - Women vs Men below 18 years - 2021") +
+    scale_y_continuous(labels = scales::label_percent(scale = 1)) +
+    scale_x_continuous(labels = scales::label_percent(scale = 1))
+  )
 
 
 ```
 
-
+### Plot 3: Average Child Marriage Rate 2005 - 2020
 
 ```{r}
 
@@ -100,202 +109,247 @@ w18f <- ne_countries(returnclass = "sf", scale = "medium") %>%
   left_join(w_18f, by = c("iso_a3" = "ISO3")) %>% 
   na.omit()
 
-ggplotly(ggplot()  +
-  geom_sf(w18f , mapping = aes(fill = latest_value, text = geoAreaName)) +
-    scale_fill_viridis_c(option = "viridis") +
-  labs(title = "Average Child Marriage Rate 2005 - 2020"))
+ggplotly(
+  ggplot()  +
+    geom_sf(w18f , mapping = aes(fill = latest_value, text = geoAreaName)) +
+    scale_fill_viridis_c(option = "viridis", direction = -1) +
+    labs(title = "Average Child Marriage Rate 2005 - 2020")
+  )
 
 
 ```
 
+
+### Plot 4: Average Child Marriage Rate in Sub Continental Region during Covid-19
 
 ```{r message=FALSE, warning=FALSE}
 
 child_marriage <- read_csv("data/child_marriage/child_marriage.csv")
 
-child_covid <- child_marriage %>% 
+child_covid <- child_marriage %>%
   clean_names()
 
-child_covid <- child_covid %>% 
-  filter(time_period_time_period == 2021) %>% 
+child_covid <- child_covid %>%
+  filter(time_period_time_period == 2021) %>%
   filter(!geographic_area %in% c("Fiji", "Denmark", "Singapore"))
 
-ggplotly(
-  (ggplot(data = child_covid) + 
-     labs(title = "Average Child Marriage Rate in Sub Continental Region during Covid-19") +
-  geom_bar(mapping = aes(y = reorder(geographic_area, obs_value_observation_value), 
-                         x = obs_value_observation_value,
-                         text = paste('Value: ', obs_value_observation_value, '<br>',
-                                      'Footnote: ', obs_footnote_observation_footnote, '<br>', 
-                                      'Data Source: ', data_source_data_source)
-                         ),
-           fill = "steelblue",
-           stat = "identity") + 
-    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
-        legend.position="none") + 
+ggplotly((
+  ggplot(data = child_covid) +
+    labs(title = "Average Child Marriage Rate in Sub Continental Region during Covid-19") +
+    geom_bar(
+      mapping = aes(
+        y = reorder(geographic_area, obs_value_observation_value),
+        x = obs_value_observation_value,
+        text = paste(
+          'Value: ',
+          obs_value_observation_value,
+          '<br>',
+          'Footnote: ',
+          obs_footnote_observation_footnote,
+          '<br>',
+          'Data Source: ',
+          data_source_data_source
+        )
+      ),
+      fill = "steelblue",
+      stat = "identity"
+    ) +
+    theme(
+      axis.text.x = element_text(
+        angle = 90,
+        vjust = 0.5,
+        hjust = 1
+      ),
+      legend.position = "none"
+    ) +
     xlab("Region") +
     ylab("Child Marriage Rate")
-    ),
-  tooltip = "text"
-)
-
-
+),
+tooltip = "text")
 
 ```
 
+
+### Plot 5: Countries with minimum legal marriage age less than 18
 
 ```{r}
 
 legal_age <- read_csv("data/child_marriage/legal_age.csv")
 
-legal_b18 <- legal_age %>% 
-  filter(comment_obs <18)
+legal_b18 <- legal_age %>%
+  filter(comment_obs < 18)
 
-ggplotly(
-  (ggplot(legal_b18, aes(fill=sex_desc, y=comment_obs, x=ref_area_desc)) + 
-    geom_bar(aes(text = paste('Country: ', ref_area_desc, '<br>',
-                              'Minimum Age: ', comment_obs, '<br>', 
-                              'Gender: ', sex_desc)),
-      position="dodge",
-      stat="identity") +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
-    labs(title = "Countries with minimum legal marriage age less than 18", x = "Country", y = "Legal Age for Marriage" )),
-  tooltip = "text"
-)
+ggplotly((
+  ggplot(legal_b18, aes(
+    fill = sex_desc, y = comment_obs, x = ref_area_desc
+  )) +
+    geom_bar(aes(
+      text = paste(
+        'Country: ',
+        ref_area_desc,
+        '<br>',
+        'Minimum Age: ',
+        comment_obs,
+        '<br>',
+        'Gender: ',
+        sex_desc
+      )
+    ),
+    position = "dodge",
+    stat = "identity") +
+    theme(axis.text.x = element_text(
+      angle = 90,
+      vjust = 0.5,
+      hjust = 1
+    )) +
+    labs(title = "Countries with minimum legal marriage age less than 18", x = "Country", y = "Legal Age for Marriage")
+),
+tooltip = "text")
 
 ```
+
+
+### Plot 6: Legality of Child Marriage(2017)
 
 ```{r}
 
 law_prohibit <- read_csv("data/child_marriage/law_prohibit.csv")
 
-law_support <- ne_countries(returnclass = "sf", scale = "medium") %>% 
-  select(iso_a3) %>% 
+law_support <-
+  ne_countries(returnclass = "sf", scale = "medium") %>%
+  select(iso_a3) %>%
   left_join(law_prohibit, by = c("iso_a3" = "Code"))
 
-ggplotly(ggplot()  +
-  geom_sf(law_support , mapping = aes(fill = as.factor(Law), text = Entity)) + 
-  labs(title = "Whether Law Prohibits Child Marriage/Early Marriage") +
-    scale_fill_manual(values=c("#fc0303", "#8cfc03"))
-  )
+ggplotly(
+  ggplot()  +
+    geom_sf(law_support , mapping = aes(fill = as.factor(Law), text = Entity)) +
+    labs(title = "Whether Law Prohibits Child Marriage/Early Marriage") +
+    scale_fill_manual(values = c("#BD827C", "#9ABCAB"))
+)
 
 ```
 
+
+### Write QGIS file format 
 
 ```{r}
 
-final <- law_prohibit %>% 
-  left_join(w_18f, by = c("Code" = "ISO3")) %>% 
+final <- law_prohibit %>%
+  left_join(w_18f, by = c("Code" = "ISO3")) %>%
   na.omit()
 
-final <- ne_countries(returnclass = "sf", scale = "medium") %>% 
-  select(iso_a3) %>% 
+final <- ne_countries(returnclass = "sf", scale = "medium") %>%
+  select(iso_a3) %>%
   left_join(final, by = c("iso_a3" = "Code"))
 
-final <- final %>% 
-  distinct()
-
-write_sf(final, "D:/info360/internship-childmarriage-healtheconomics/data/childmarriage-allcountries.gpkg", row.names=FALSE)
+write_sf(
+  final,
+  "D:/info360/internship-childmarriage-healtheconomics/data/childmarriage-allcountries.gpkg",
+  row.names = FALSE
+)
 
 ```
+
+### Legality of Child marriage(2019)
 
 ```{r message=FALSE, warning=FALSE}
 
 law_2 <- read_csv("data/child_marriage/law_2.csv")
 
-law_2 <- ne_countries(returnclass = "sf", scale = "medium") %>% 
-  select(iso_a3) %>% 
+law_2 <- ne_countries(returnclass = "sf", scale = "medium") %>%
+  select(iso_a3) %>%
   left_join(law_2, by = c("iso_a3" = "Code"))
 
-law_2 <- law_2 %>% 
+law_2 <- law_2 %>%
   na.omit()
 
-ggplotly(ggplot()  +
-  geom_sf(law_2 , mapping = aes(fill = as.factor(Law), text = Entity)) + 
-  labs(title = "Whether Law Prohibits Child Marriage/Early Marriage", caption = "Categories coded as: 0 = marriage prohibited under 18 without exceptions; 0.25 = marriage prohibited under 18 without exceptions, but some customary or traditional laws encourage girl marriage; 0.5 = marriage prohibited under 18 but there are legal exceptions regarding consent and/or some groups of women; 0.75 = marriage allowed under 18 for boys and girls; 1 = marriage allowed under 18 for girls but not boys.") +
-    theme_360() +
-    scale_fill_manual(values=c("#ed331f", "#fc9403", "#fce303", "#b5fc03","#1fede6"))
-  )
-
-
 ggplot()  +
-  geom_sf(law_2 , mapping = aes(fill = as.factor(Law), text = Entity)) + 
-  labs(title = "Legal provisions for child marriage", caption = "Categories coded as: \n 0 = marriage prohibited under 18 without exceptions; \n 0.25 = marriage prohibited under 18 without exceptions, \n but some customary or traditional laws encourage girl marriage; \n 0.5 = marriage prohibited under 18 \n but there are legal exceptions regarding consent and/or some groups of women; \n 0.75 = marriage allowed under 18 for boys and girls; \n 1 = marriage allowed under 18 for girls but not boys.") +
-    scale_fill_manual(values=c("#ed331f", "#fc9403", "#fce303", "#b5fc03","#1fede6"), name = "Law Compliance") +
+  geom_sf(law_2 , mapping = aes(fill = as.factor(Law), text = Entity)) +
+  labs(title = "Legal provisions for child marriage", 
+       caption = "Categories coded as: \n 
+       0 = marriage prohibited under 18 without exceptions; \n 
+       0.25 = marriage prohibited under 18 without exceptions, \n 
+       but some customary or traditional laws encourage girl marriage; \n 
+       0.5 = marriage prohibited under 18 \n 
+       but there are legal exceptions regarding consent and/or some groups of women; \n 
+       0.75 = marriage allowed under 18 for boys and girls; 
+       \n 1 = marriage allowed under 18 for girls but not boys.") +
+  scale_fill_manual(
+    values = c("#8B3574", "#FFEA97", "#F1B33A", "#E7770B", "#600119"),
+    name = "Law Compliance"
+  ) +
   theme(plot.caption.position = "plot",
-        plot.caption = element_text(hjust = 0)) + theme_360()
-
+        plot.caption = element_text(hjust = 0)) + 
+  theme_360()
 
 
 ```
+### Final Plot 1.2 Average Child Marriage Rate in Sub Continental Region during Covid-19
 
 ```{r warning=FALSE}
 
-ggplot(data = child_covid, aes(y = reorder(geographic_area, obs_value_observation_value), 
-                         x = obs_value_observation_value) ) + 
+ggplot(data = child_covid, aes(
+  y = reorder(geographic_area, obs_value_observation_value),
+  x = obs_value_observation_value
+)) +
   geom_bar(fill = "steelblue",
            stat = "identity") +
-  geom_text(aes(label=obs_value_observation_value), hjust=1.6, color="white", size=3.5) +
+  geom_text(
+    aes(label = obs_value_observation_value),
+    hjust = 1.6,
+    color = "white",
+    size = 3.5
+  ) +
   labs(title = "Average Child Marriage Rate in Sub Continental Region during Covid-19") +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
-        legend.position="none") + 
-    xlab("Child Marriage Rate") +
-    ylab("Region") +
-  theme_360()
-
-
-```
-
-```{r warning = FALSE}
-
-ggplot(w18f)  +
-  geom_sf(aes(fill = latest_value)) +
-  geom_sf_text(aes(label = latest_value), color = "white") +
-    scale_fill_viridis_c(option = "viridis") +
-  labs(title = "Average Child Marriage Rate 2005 - 2020") +
+  theme(axis.text.x = element_text(
+    angle = 90,
+    vjust = 0.5,
+    hjust = 1
+  ),
+  legend.position = "none") +
+  xlab("Child Marriage Rate") +
+  ylab("Region") +
   theme_360()
 
 ```
+## Pattern Trials
 
+### Test 1
 
 ```{r}
 
 ggplot() +
-  geom_sf(cm_final , mapping = aes(fill = latest_value)) + 
-  labs(title = "Legal provisions for child marriage", caption = "Categories coded as: \n 0 = marriage prohibited under 18 without exceptions; \n 0.25 = marriage prohibited under 18 without exceptions, \n but some customary or traditional laws encourage girl marriage; \n 0.5 = marriage prohibited under 18 \n but there are legal exceptions regarding consent and/or some groups of women; \n 0.75 = marriage allowed under 18 for boys and girls; \n 1 = marriage allowed under 18 for girls but not boys.") +
-    scale_fill_viridis_c(option = "viridis", name = "Legal Laws") +
-  theme(plot.caption.position = "plot",
-        plot.caption = element_text(hjust = 0)) + theme_360()
-
-```
-
-```{r}
-
-ggplot() +
-  geom_sf(data = countries, 
+  geom_sf(data = countries,
           mapping = aes(fill = NULL)) +
-  geom_sf(data = cmf1 , 
+  geom_sf(data = cmf1 ,
           mapping = aes(fill = latest_value)) +
   #scale_color_continuous_sequential(palette = "Reds") +
   geom_sf_pattern(
-    mapping = aes(pattern = Law, pattern_angle = Law, pattern_spacing = Law, fill = latest_value),
+    mapping = aes(
+      pattern = Law,
+      pattern_angle = Law,
+      pattern_spacing = Law,
+      fill = latest_value
+    ),
     data = cmf1,
     stat = "sf",
     position = "identity",
-    pattern_density = 0.05, 
+    pattern_density = 0.05,
     pattern_fill    = 'black',
     pattern_colour  = 'black'
-    ) +
+  ) +
   scale_pattern_spacing_continuous(range = c(0.01, 0.07)) +
   labs(title = "Average Child Marriage Rate 2005 - 2020")
 
-scale_fill_binned()
-scale_fill_fermenter()
 
+```
 
+### Test 2
+
+```{r}
 
 ggplot() +
-  geom_sf(data = countries, 
+  geom_sf(data = countries,
           mapping = aes(fill = NULL)) +
   geom_sf_pattern(
     mapping = aes(pattern_shape = LawStr,
@@ -308,16 +362,22 @@ ggplot() +
     colour    = 'black',
     pattern_angle  = 0,
     pattern_alpha = 0.4,
-    ) +
-  scale_fill_fermenter(name = "Child Marriage Rate") + 
+  ) +
+  scale_fill_fermenter(name = "Child Marriage Rate") +
   labs(title = "Average Child Marriage Rate 2005 - 2020") +
   #coord_sf(crs = "ESRI:54012") +
   theme_minimal()
 
 save_360plot(cm, cm.png)
 
+```
+
+### Test 3
+
+```{r}
+
 ggplot() +
-  geom_sf(data = countries, 
+  geom_sf(data = countries,
           mapping = aes(fill = NULL)) +
   geom_sf_pattern(
     mapping = aes(pattern_density = LawStr,
@@ -327,26 +387,29 @@ ggplot() +
     position = "identity",
     pattern = 'stripe',
     pattern_fill = "black"
-    ) +
-  scale_fill_fermenter(name = "Child Marriage Rate") + 
+  ) +
+  scale_fill_fermenter(name = "Child Marriage Rate") +
   labs(title = "Average Child Marriage Rate 2005 - 2020") +
   #coord_sf(crs = "ESRI:54012") +
   theme_minimal()
 
-
 ```
+
+### Final Pattern Map
 
 ```{r}
 
 combined_map <- ggplot() +
-  geom_sf(data = countries, 
+  geom_sf(data = countries,
           mapping = aes(fill = NULL)) +
   geom_sf_pattern(
-    mapping = aes(pattern_spacing = LawStr,
-        pattern_density = LawStr,
-        pattern_angle   = LawStr,
-        pattern         = LawStr,
-        fill = latest_value),
+    mapping = aes(
+      pattern_spacing = LawStr,
+      pattern_density = LawStr,
+      pattern_angle   = LawStr,
+      pattern         = LawStr,
+      fill = latest_value
+    ),
     data = cmf1,
     stat = "sf",
     position = "identity",
@@ -355,27 +418,29 @@ combined_map <- ggplot() +
     pattern_aspect_ratio = 1.8,
     pattern_fill = "black",
     pattern_alpha = 0.4
-    ) +
-   scale_pattern_density_discrete(range = c(0.01, 0.3)) + 
-  scale_pattern_spacing_discrete(range = c(0.01, 0.03)) + 
-  scale_fill_fermenter(name = "Child Marriage Rate") + 
+  ) +
+  scale_pattern_density_discrete(range = c(0.01, 0.3)) +
+  scale_pattern_spacing_discrete(range = c(0.01, 0.03)) +
+  scale_fill_fermenter(name = "Child Marriage Rate") +
   labs(
     title = "CHILD MARRIAGE",
     subtitle = "Average child marriage rate (2005-2020) and legality",
     caption = paste(
       "**CHART::** Ambalika Gupta & James Goldie, 360info",
       "**DATA::** World Bank",
-      sep = "<br>")) +
-  #coord_sf(crs = "ESRI:54012") 
-ggsave(
-  "chart_test.png" ,
-  plot = combined_map,
-  scale = 0.9,
-  width = 20,
-  height = 10,
-  units = "cm",
-  dpi=320
-)
+      sep = "<br>"
+    )
+  ) 
+  
+  ggsave(
+    "chart_test.png" ,
+    plot = combined_map,
+    scale = 0.9,
+    width = 20,
+    height = 10,
+    units = "cm",
+    dpi = 320
+  )
 
 ```
 

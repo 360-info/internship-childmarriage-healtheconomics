@@ -9,6 +9,8 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+# Packages used
+
 ```{r package}
 
 library(readr)
@@ -22,7 +24,9 @@ library(themes360info)
 
 ```
 
-```{r}
+## Read data
+
+```{r data}
 
 w_18 <- read_csv("data/child_marriage/w_18.csv")
 
@@ -55,7 +59,10 @@ cmf1 %>%
 ```
 
 
-```{r}
+## Plot 1: % women aged 20-24 married before 18 (average 2005-2020)
+
+```{r visualisation}
+
 rate_map <- ggplot() +
  geom_sf(data = countries, fill = "grey", colour = "black") +
   geom_sf(
@@ -89,4 +96,61 @@ rate_map <- ggplot() +
   )
 
 save_360plot(rate_map, "rate_map.png", retina = 4, shape = "sdtv-landscape")
+
 ```
+
+
+### Plot 2: Avg Child Marriage Rate in Sub Continental Region during Covid-19
+
+```{r}
+
+child_marriage <- read_csv("data/child_marriage/child_marriage.csv")
+
+child_covid <- child_marriage %>%
+  clean_names()
+
+child_covid <- child_covid %>%
+  filter(time_period_time_period == 2021) %>%
+  filter(!geographic_area %in% c("Fiji", "Denmark", "Singapore"))
+
+ggplot(data = child_covid, aes(
+  y = reorder(geographic_area, obs_value_observation_value),
+  x = obs_value_observation_value
+)) +
+  geom_bar(fill = "steelblue",
+           stat = "identity") +
+  geom_text(
+    aes(label = obs_value_observation_value),
+    hjust = 1.6,
+    color = "white",
+    size = 3.5
+  ) +
+  labs(title = "Average Child Marriage Rate in Sub Continental Region during Covid-19") +
+  theme(axis.text.x = element_text(
+    angle = 90,
+    vjust = 0.5,
+    hjust = 1
+  ),
+  legend.position = "none") +
+  xlab("Child Marriage Rate") +
+  ylab("Region") +
+  theme_360()
+
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
