@@ -1,6 +1,4 @@
-/data
-
-# Dataset used
+# Datasets used
 
 ## Plot 1: "Average Child Marriage Rate 2005 - 2020"
 
@@ -46,57 +44,90 @@ Indicator 5.3.1: Proportion of women aged 20–24 years who were married or in a
 * Population: num [1:183] Numeric(Actual Number)
 
 
-Dataset used in "Average Child Marriage Rate in Sub Continental Region in 2021"
-filename: child_marriage.csv
-URL: https://data.unicef.org/resources/data_explorer/unicef_f/?ag=UNICEF&df=GLOBAL_DATAFLOW&ver=1.0&dq=.PT_F_20-24_MRD_U15+PT_F_20-24_MRD_U18+PT_F_15-19_MRD..&startPeriod=2016&endPeriod=2022
-Description
-Data Dictionary: spec_tbl_df [12 x 12]
-       `Geographic area` = col_character(),
-  ..   `TIME_PERIOD:Time period` = col_double(),
-  ..   `OBS_VALUE:Observation Value` = col_double(),
-  ..   `OBS_FOOTNOTE:Observation footnote` = col_character(),
-  ..   `SERIES_FOOTNOTE:Series footnote` = col_logical(),
-  ..   `DATA_SOURCE:Data Source` = col_character(),
-  ..   `SOURCE_LINK:Citation of or link to the data source` = col_logical(),
-  ..   `CUSTODIAN:Custodian` = col_logical(),
-  ..   `TIME_PERIOD_METHOD:Time period activity related to when the data are collected` = col_character(),
-  ..   `REF_PERIOD:Reference Period` = col_logical(),
-  ..   `COVERAGE_TIME:The period of time for which data are provided` = col_character(),
-  ..   `AGE:Current age` = col_character()
+## Plot 3: "Average Child Marriage Rate in Sub Continental Region in 2021"
+
+### Description: 
+This dataset contains Percentage of women (aged 20-24 years) married or in union before age 18 during Covid-19 period
+
+### URL: [UNICEF Data](https://data.unicef.org/resources/data_explorer/unicef_f/?ag=UNICEF&df=GLOBAL_DATAFLOW&ver=1.0&dq=.PT_F_20-24_MRD_U15+PT_F_20-24_MRD_U18+PT_F_15-19_MRD..&startPeriod=2016&endPeriod=2022)
+
+### Filename: child_marriage.csv
+
+### Data Dictionary: spec_tbl_df [131 x 33]
+
+* Geographic area = chr - Country Name  = col_character()
+* Time period = Year of observation  = col_character()
+* OBS_VALUE:O Child Marriage Rate  = col_character()
+* OBS_FOOTNOTE: Footnote` = col_character()
+* SERIES_FOOTNOTE: col_logical()
+* DATA_SOURCE: Data Source` = col_character(),
+* SOURCE_LINK: Citation of or link to the data source` = col_logical(),
+* CUSTODIAN: col_logical(),
+* TIME_PERIOD_METHOD: Time period activity related to when the data are collected` = col_character(),
+* REF_PERIOD: Reference Period` = col_logical(),
+* COVERAGE_TIME: The period of time for which data are provided` = col_character(),
+* AGE: age group covered in dataset = col_character()
+
+
+## Plot 4: "Countries with minimum legal marriage age less than 18"
+
+### Description: 
+This dataset contains minimum legal age for marriage without consent
+
+### URL: [UNICEF Data](http://data.un.org/Data.aspx?q=marriage&d=GenderStat&f=inID:19)
+
+### Filename: legal_age.csv
+
+### Data Dictionary: spec_tbl_df [131 x 33]
+
+* Geographic area = chr - Country Name  = col_character()
+* Time period = Year of observation  = col_character()
+* OBS_VALUE:O Child Marriage Rate  = col_character()
+* OBS_FOOTNOTE: Footnote` = col_character()
+* SERIES_FOOTNOTE: col_logical()
+* DATA_SOURCE: Data Source` = col_character(),
+* SOURCE_LINK: Citation of or link to the data source` = col_logical(),
+* CUSTODIAN: col_logical(),
+* TIME_PERIOD_METHOD: Time period activity related to when the data are collected` = col_character(),
+* REF_PERIOD: Reference Period` = col_logical(),
+* COVERAGE_TIME: The period of time for which data are provided` = col_character(),
+* AGE: age group covered in dataset = col_character()
+
+
 
 Dataset used in "Countries with minimum legal marriage age less than 18"
 filename: legal_age.csv
-URL: https://opendata.arcgis.com/api/v3/datasets/8ba8255a4ba047fcb0e6dbe8041a0eb0_0/downloads/data?format=csv&spatialRefId=4326&where=1%3D1
+URL: http://data.un.org/Data.aspx?q=marriage&d=GenderStat&f=inID:19
 Description
 Data Dictionary: cols(
-  ..   ObjectId = col_double(),
-  ..   indicator_label = col_character(),
-  ..   indicator_id = col_character(),
-  ..   indicator_desc = col_character(),
-  ..   minset_series = col_character(),
-  ..   minset_series_desc = col_character(),
-  ..   ref_area = col_double(),
-  ..   ref_area_desc = col_character(),
-  ..   iso3 = col_character(),
-  ..   x = col_double(),
-  ..   y = col_double(),
-  ..   sdg_region = col_character(),
-  ..   sex = col_character(),
-  ..   sex_desc = col_character(),
-  ..   time_period = col_double(),
-  ..   time_detail = col_character(),
-  ..   value_category = col_double(),
-  ..   value_category_desc = col_character(),
-  ..   nature = col_character(),
-  ..   nature_desc = col_character(),
-  ..   reporting_type = col_character(),
-  ..   reporting_type_desc = col_character(),
-  ..   comment_obs = col_double(),
-  ..   source_detail = col_character(),
-  ..   source_detail_url = col_character(),
-  ..   source_year = col_double(),
-  ..   dimensions = col_character(),
-  ..   is_latest_year = col_double()
+* ObjectId = col_double(),
+* indicator_label = col_character(),
+* indicator_id = col_character(),
+* indicator_desc = col_character(),
+* minset_series = col_character(),
+* minset_series_desc = col_character(),
+* ref_area = col_double(),
+* ref_area_desc = col_character(),
+* iso3 = col_character(),
+* x = col_double(),
+* y = col_double(),
+* sdg_region = col_character(),
+* sex = col_character(),
+* sex_desc = col_character(),
+* time_period = col_double(),
+* time_detail = col_character(),
+* value_category = col_double(),
+* value_category_desc = col_character(),
+* nature = col_character(),
+* nature_desc = col_character(),
+* reporting_type = col_character(),
+* reporting_type_desc = col_character(),
+* comment_obs = col_double(),
+* source_detail = col_character(),
+* source_detail_url = col_character(),
+* source_year = col_double(),
+* dimensions = col_character(),
+* is_latest_year = col_double()
   .. )
 
 Dataset used in "Legality of Child Marriage(2017)"\
@@ -104,10 +135,10 @@ filename: law_prohibit.csv
 URL: https://ourworldindata.org/grapher/does-law-prohibit-or-invalidate-child-or-early-marriage
 Description
 Data Dictionary:  cols(
-  ..   Entity = col_character(),
-  ..   Code = col_character(),
-  ..   Year = col_double(),
-  ..   Law = col_double()
+* Entity = col_character(),
+* Code = col_character(),
+* Year = col_double(),
+* Law = col_double()
   .. )
 
 
