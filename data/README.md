@@ -2,7 +2,7 @@
 
 # Dataset used
 
-## Plot Name: "Average Child Marriage Rate 2005 - 2020"
+## Plot 1: "Average Child Marriage Rate 2005 - 2020"
 
 ### Description: 
 - This dataset is part of the Global SDG Indicator Database compiled through the UN System in preparation for the Secretary-General's annual report on Progress towards the Sustainable Development Goals.
@@ -10,7 +10,7 @@ Indicator 5.3.1: Proportion of women aged 20–24 years who were married or in a
 - Target 5.3: Eliminate all harmful practices, such as child, early and forced marriage and female genital mutilation
 - Goal 5: Achieve gender equality and empower all women and girls
 
-###URL: [UN Stats](https://unstats-undesa.opendata.arcgis.com/datasets/undesa::indicator-5-3-1-proportion-of-women-aged-20-24-years-who-were-married-or-in-a-union-before-age-18-percent/explore?location=2.960853%2C1.735981%2C2.67)
+### URL: [UN DESA Statistics Division](https://unstats-undesa.opendata.arcgis.com/datasets/undesa::indicator-5-3-1-proportion-of-women-aged-20-24-years-who-were-married-or-in-a-union-before-age-18-percent/explore?location=2.960853%2C1.735981%2C2.67)
 
 ### Filename: w_18.csv
 
@@ -27,17 +27,24 @@ Indicator 5.3.1: Proportion of women aged 20–24 years who were married or in a
 * ISO3        : chr [1:131] ISO3 country code
 * latest_value: num [1:131] Child Marriage Rate
 
-Dataset used in "Child Marriage rate - Women vs Men below 18 years - 2021"
-filename: cm_2021_new.xlsx
-URL: https://data.unicef.org/wp-content/uploads/2021/10/Table-12-Child-Protection-SOWC2021-EN.xlsx
-Description
-Data Dictionary: tibble [183 x 6] (S3: tbl_df/tbl/data.frame)
- $ Country   : chr [1:183] "Afghanistan" "Albania" "Algeria" "Andorra" ...
- $ w15       : chr [1:183] "4.2014570000000004" "1.38724" "0" "-" ...
- $ w18       : chr [1:183] "28.257380000000001" "11.760540000000001" "3.8" "-" ...
- $ m18       : chr [1:183] "7.3" "1.2" "-" "-" ...
- $ Region    : chr [1:183] "Asia" "Europe" "Africa" "Europe" ...
- $ Population: num [1:183] 4112
+## Plot 2: "Child Marriage rate - Women vs Men below 18 years - 2021"
+
+### Description: 
+- This dataset contains percentage of women aged 20 to 24 years who were first married or in union before age 15; percentage of women and percentage of men aged 20 to 24 years who were first married or in union before age 18
+
+### URL: [UNICEF Data](https://data.unicef.org/wp-content/uploads/2021/10/Table-12-Child-Protection-SOWC2021-EN.xlsx)
+
+### Filename: cm_2021_new.xlsx
+
+### Data Dictionary: spec_tbl_df [131 x 33]
+
+* Country   : chr [1:183] Country Name
+* w15       : chr [1:183] Child Marriage rate for women below 15 yrs of age
+* w18       : chr [1:183] Child Marriage rate for women below 18 yrs of age
+* m18       : chr [1:183] Child Marriage rate for men below 18 yrs of age
+* Region    : chr [1:183] Continent Region
+* Population: num [1:183] Numeric(Actual Number)
+
 
 Dataset used in "Average Child Marriage Rate in Sub Continental Region in 2021"
 filename: child_marriage.csv
