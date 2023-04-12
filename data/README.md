@@ -3,24 +3,29 @@
 # Dataset used
 
 ## Plot Name: "Average Child Marriage Rate 2005 - 2020"
-file name: w_18.csv
-Description: 
+
+### Description: 
 - This dataset is part of the Global SDG Indicator Database compiled through the UN System in preparation for the Secretary-General's annual report on Progress towards the Sustainable Development Goals.
 Indicator 5.3.1: Proportion of women aged 20–24 years who were married or in a union before age 15 and before age 18
 - Target 5.3: Eliminate all harmful practices, such as child, early and forced marriage and female genital mutilation
 - Goal 5: Achieve gender equality and empower all women and girls
-URL: https://unstats-undesa.opendata.arcgis.com/datasets/undesa::indicator-5-3-1-proportion-of-women-aged-20-24-years-who-were-married-or-in-a-union-before-age-18-percent/explore?location=2.960853%2C1.735981%2C2.67
-Data Dictionary: spec_tbl_df [131 x 33] (S3: spec_tbl_df/tbl_df/tbl/data.frame)
- $ geoAreaCode : num [1:131] Country Code
- $ geoAreaName : chr [1:131] Country Name
- $ level_      : num [1:131] Numeric
- $ parentCode  : num [1:131] Numeric
- $ parentName  : chr [1:131] Sub Continental Region
- $ type        : chr [1:131] Geographical level
- $ X           : num [1:131] Latitude
- $ Y           : num [1:131] Longitude
- $ ISO3        : chr [1:131] ISO3 country code
- $ latest_value: num [1:131] Child Marriage Rate
+
+###URL: [UN Stats](https://unstats-undesa.opendata.arcgis.com/datasets/undesa::indicator-5-3-1-proportion-of-women-aged-20-24-years-who-were-married-or-in-a-union-before-age-18-percent/explore?location=2.960853%2C1.735981%2C2.67)
+
+### Filename: w_18.csv
+
+### Data Dictionary: spec_tbl_df [131 x 33]
+
+* geoAreaCode : num [1:131] Country Code
+* geoAreaName : chr [1:131] Country Name
+* level_      : num [1:131] Numeric
+* parentCode  : num [1:131] Numeric
+* parentName  : chr [1:131] Sub Continental Region
+* type        : chr [1:131] Geographical level
+* X           : num [1:131] Latitude
+* Y           : num [1:131] Longitude
+* ISO3        : chr [1:131] ISO3 country code
+* latest_value: num [1:131] Child Marriage Rate
 
 Dataset used in "Child Marriage rate - Women vs Men below 18 years - 2021"
 filename: cm_2021_new.xlsx
