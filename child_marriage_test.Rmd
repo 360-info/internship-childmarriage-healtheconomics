@@ -31,34 +31,8 @@ library(themes360info)
 
 ```
 
-### Plot 1 : Covid-19 Stringency
 
-```{r covid}
-
-stringency <- read_excel("data/child_marriage/stringency.xlsx")
-
-stringencyf <- stringency %>% 
-  na.omit() %>% 
-  group_by(continent, location, population) %>% 
-  summarise(value = mean(stringency_index)) %>% 
-  mutate(value = as.numeric(value))
-
-countries <- ne_countries(returnclass = "sf", scale = "medium")
-covid <- ne_countries(returnclass = "sf", scale = "medium") %>% 
-  select(admin) %>% 
-  left_join(stringencyf, by = c("admin" = "location"))
-
-
-ggplotly(ggplot()+
-  geom_sf(covid , mapping = aes(fill = value, text = admin)) + 
-    scale_fill_viridis_c(option = "viridis") +
-    labs(title = "Covid-19 Stringency"))
-
-
-```
-
-
-### Plot 2: Child Marriage rate - Women vs Men below 18 years - 2021
+### Plot 1: Child Marriage rate - Women vs Men below 18 years - 2021
 
 ```{r gender}
 
@@ -250,7 +224,7 @@ write_sf(
 
 ```
 
-### Legality of Child marriage(2019)
+### Laws for Child marriage(2019)
 
 ```{r message=FALSE, warning=FALSE}
 
@@ -284,6 +258,8 @@ ggplot()  +
 
 
 ```
+
+
 ### Final Plot 1.2 Average Child Marriage Rate in Sub Continental Region during Covid-19
 
 ```{r warning=FALSE}

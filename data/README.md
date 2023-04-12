@@ -1,5 +1,6 @@
 
 Dataset used in "Average Child Marriage Rate 2005 - 2020"
+file name: w_18.csv
 URL: https://unstats-undesa.opendata.arcgis.com/datasets/undesa::indicator-5-3-1-proportion-of-women-aged-20-24-years-who-were-married-or-in-a-union-before-age-18-percent/explore?location=2.960853%2C1.735981%2C2.67
 Description:
 Data Dictionary: spec_tbl_df [131 x 33] (S3: spec_tbl_df/tbl_df/tbl/data.frame)
@@ -15,6 +16,7 @@ Data Dictionary: spec_tbl_df [131 x 33] (S3: spec_tbl_df/tbl_df/tbl/data.frame)
  $ latest_value: num [1:131] 28.3 11.8 3.8 30.3 5.
 
 Dataset used in "Child Marriage rate - Women vs Men below 18 years - 2021"
+filename: cm_2021_new.xlsx
 URL: https://data.unicef.org/wp-content/uploads/2021/10/Table-12-Child-Protection-SOWC2021-EN.xlsx
 Description
 Data Dictionary: tibble [183 x 6] (S3: tbl_df/tbl/data.frame)
@@ -26,6 +28,7 @@ Data Dictionary: tibble [183 x 6] (S3: tbl_df/tbl/data.frame)
  $ Population: num [1:183] 4112
 
 Dataset used in "Average Child Marriage Rate in Sub Continental Region in 2021"
+filename: child_marriage.csv
 URL: https://data.unicef.org/resources/data_explorer/unicef_f/?ag=UNICEF&df=GLOBAL_DATAFLOW&ver=1.0&dq=.PT_F_20-24_MRD_U15+PT_F_20-24_MRD_U18+PT_F_15-19_MRD..&startPeriod=2016&endPeriod=2022
 Description
 Data Dictionary: spec_tbl_df [12 x 12]
@@ -43,6 +46,7 @@ Data Dictionary: spec_tbl_df [12 x 12]
   ..   `AGE:Current age` = col_character()
 
 Dataset used in "Countries with minimum legal marriage age less than 18"
+filename: legal_age.csv
 URL: https://opendata.arcgis.com/api/v3/datasets/8ba8255a4ba047fcb0e6dbe8041a0eb0_0/downloads/data?format=csv&spatialRefId=4326&where=1%3D1
 Description
 Data Dictionary: cols(
@@ -76,7 +80,8 @@ Data Dictionary: cols(
   ..   is_latest_year = col_double()
   .. )
 
-Dataset used in "Whether Law Prohibits Child Marriage/Early Marriage"
+Dataset used in "Legality of Child Marriage(2017)"\
+filename: law_prohibit.csv
 URL: https://ourworldindata.org/grapher/does-law-prohibit-or-invalidate-child-or-early-marriage
 Description
 Data Dictionary:  cols(
@@ -86,18 +91,9 @@ Data Dictionary:  cols(
   ..   Law = col_double()
   .. )
 
-Dataset used in "Covid-19 Stringency"
-URL: https://ourworldindata.org/grapher/does-law-prohibit-or-invalidate-child-or-early-marriage
-Description
-Data Dictionary: tibble [293,717 x 6] (S3: tbl_df/tbl/data.frame)
- $ iso_code        : chr [1:293717] "AFG" "AFG" "AFG" "AFG" ...
- $ continent       : chr [1:293717] "Asia" "Asia" "Asia" "Asia" ...
- $ location        : chr [1:293717] "Afghanistan" "Afghanistan" "Afghanistan" "Afghanistan" ...
- $ date            : POSIXct[1:293717], format: "2020-01-03" "2020-01-04" "2020-01-05" ...
- $ stringency_index: num [1:293717] NA NA NA NA NA NA NA NA NA NA ...
- $ population      : num [1:293717] 41128772 
 
-Dataset used in Legality of Child Marriage
+Dataset used in "Laws for Child marriage(2019)"
+filename: law_2.csv
 URL: https://ourworldindata.org/grapher/laws-on-child-marriage
 Data Dictionary: Classes 'data.frame':	178 obs. of  4 variables:
  $ iso_a3  : chr  "AFG" "AGO" "ALB" "ARE" ...
