@@ -17,3 +17,21 @@ library(ggplot2)
 library(themes360info)
 
 ```
+
+```{r readdata}
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+

@@ -80,26 +80,6 @@ This dataset contains minimum legal age for marriage without consent
 
 ### Data Dictionary: spec_tbl_df [131 x 33]
 
-* Geographic area = chr - Country Name  = col_character()
-* Time period = Year of observation  = col_character()
-* OBS_VALUE:O Child Marriage Rate  = col_character()
-* OBS_FOOTNOTE: Footnote` = col_character()
-* SERIES_FOOTNOTE: col_logical()
-* DATA_SOURCE: Data Source` = col_character(),
-* SOURCE_LINK: Citation of or link to the data source` = col_logical(),
-* CUSTODIAN: col_logical(),
-* TIME_PERIOD_METHOD: Time period activity related to when the data are collected` = col_character(),
-* REF_PERIOD: Reference Period` = col_logical(),
-* COVERAGE_TIME: The period of time for which data are provided` = col_character(),
-* AGE: age group covered in dataset = col_character()
-
-
-
-Dataset used in "Countries with minimum legal marriage age less than 18"
-filename: legal_age.csv
-URL: http://data.un.org/Data.aspx?q=marriage&d=GenderStat&f=inID:19
-Description
-Data Dictionary: cols(
 * ObjectId = col_double(),
 * indicator_label = col_character(),
 * indicator_id = col_character(),
@@ -128,28 +108,40 @@ Data Dictionary: cols(
 * source_year = col_double(),
 * dimensions = col_character(),
 * is_latest_year = col_double()
-  .. )
-
-Dataset used in "Legality of Child Marriage(2017)"\
-filename: law_prohibit.csv
-URL: https://ourworldindata.org/grapher/does-law-prohibit-or-invalidate-child-or-early-marriage
-Description
-Data Dictionary:  cols(
-* Entity = col_character(),
-* Code = col_character(),
-* Year = col_double(),
-* Law = col_double()
-  .. )
 
 
-Dataset used in "Laws for Child marriage(2019)"
-filename: law_2.csv
-URL: https://ourworldindata.org/grapher/laws-on-child-marriage
-Data Dictionary: Classes 'data.frame':	178 obs. of  4 variables:
- $ iso_a3  : chr  "AFG" "AGO" "ALB" "ARE" ...
- $ Entity  : chr  "Afghanistan" "Angola" "Albania" "United Arab Emirates" ...
- $ Year    : num  2019 2019 2019 2019 2019 ...
- $ Law     : num  1 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 ...
+## Plot 5: "Legality of Child Marriage(2017)"
+
+### Description: 
+....
+
+### URL: [Our World in Data](https://ourworldindata.org/grapher/does-law-prohibit-or-invalidate-child-or-early-marriage)
+
+### Filename: law_prohibit.csv
+
+### Data Dictionary: spec_tbl_df [131 x 33]
+
+* Entity = Country Name
+* Code = ISO3 country code
+* Year = Year
+* Law = Allowed/Prohibited
+
+
+## Plot 6: "Laws for Child marriage(2019)"
+
+### Description: 
+....
+
+### URL: [Our World in Data](https://ourworldindata.org/grapher/laws-on-child-marriage)
+
+### Filename: law_prohibit.csv
+
+### Data Dictionary: spec_tbl_df [131 x 33]
+
+* iso_a3  : ISO3 Country Code
+* Entity  : Country Name
+* Year    : Year
+* Law     : Legal code
 
 
 
