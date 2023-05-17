@@ -12,6 +12,8 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r package}
 
 library(readr)
+library(readxl)
+library(janitor)
 library(tidyverse)
 library(ggplot2)
 library(themes360info)
@@ -20,7 +22,24 @@ library(themes360info)
 
 ```{r readdata}
 
+hdi <- read_excel("data/healtheconomics/hdi.xlsx")
 
+whr <- read_excel("data/healtheconomics/wellbeing-otherfactos.xls")
+
+whr <- whr %>% 
+  clean_names()
+
+hdi <- hdi %>% 
+  clean_names()
+
+whr <- whr %>% 
+  mutate(score = life_ladder/10)
+
+combined <- whr %>% 
+  left_join(hdi, by = c("country_name" = "country"))
+
+final <- combined %>% 
+  select(country_name, year, score,)
 
 ```
 
