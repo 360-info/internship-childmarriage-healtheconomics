@@ -12,23 +12,167 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r package}
 
 library(readr)
+library(readxl)
+library(janitor)
 library(tidyverse)
+library(rnaturalearth)
 library(ggplot2)
+library(plotly)
 library(themes360info)
 
 ```
 
 ```{r readdata}
 
+hdi_timeseries <- read_csv("data/healtheconomics/hdi_timeseries.csv")
+
+hdi_timeseries <- hdi_timeseries %>% 
+  pivot_longer(
+    cols = 6:37,
+    names_to = "year",
+    values_to = "HDI"
+  )
+
+hdi_timeseries <- hdi_timeseries %>% 
+  select(c(-region, -hdicode, -hdi_rank_2021))
+
+hdi_timeseries <- hdi_timeseries %>% 
+  mutate(year = str_remove_all(year, "hdi_")) %>% 
+  mutate(year = as.numeric(year))
+
+hdi_timeseries
+
+whr <- read_excel("data/healtheconomics/wellbeing-otherfactos.xls")
+
+whr <- whr %>% 
+  clean_names()
+
+whr <- whr %>% 
+  mutate(WHR = life_ladder/10)
+
+final <- merge(whr, hdi_timeseries, by.x = c("country_name", "year"), by.y = c("country", "year")) %>% 
+  select(country_name, year, 13:15)
+
+final1 <- final %>% 
+  pivot_longer(cols = c(3,5),
+               names_to = "organisation",
+               values_to = "score")
+
+countries <- ne_countries(returnclass = "sf", scale = "medium")
+
+geo <- countries %>% 
+  select(admin, iso_a3, subregion, region_wb)
+
+combined <- merge(final1, geo, by.x = "iso3", by.y = "iso_a3")
+
+southasia <- combined %>% 
+  filter( subregion == "Southern Asia")
+
+```
+
+```{r}
+
+base = southasia %>% 
+  ggplot(aes(x= year, y = score, color = organisation)) +
+  geom_line() +
+  geom_point() +
+  theme(legend.position = "bottom")
+
+ggplotly(base + facet_wrap(~country_name, nrow = 4))
+
+unique(combined$subregion)
 
 
 ```
 
 
+```{r}
+
+centralasia <- combined %>% 
+  filter( subregion == "Central Asia")
+
+westernasia <- combined %>% 
+  filter( subregion == "Western Asia")
+
+easternasia <- combined %>% 
+  filter( subregion == "Eastern Asia")
+
+seasia <- combined %>% 
+  filter( subregion == "South-Eastern Asia")
+
+ausnz <- combined %>% 
+  filter( subregion == "Australia and New Zealand")
+
+carribean <- combined %>% 
+  filter( subregion == "Caribbean")
+
+```
+
+```{r}
+
+le <- read_excel("data/healtheconomics/le.xlsx")
+
+le <- le %>% 
+  pivot_longer(
+    cols = 4:35,
+    names_to = "year",
+    values_to = "life_expectancy"
+  )
+
+le <- le %>% 
+  select(c(-hdicode))
+
+le <- le %>% 
+  mutate(year = str_remove_all(year, "le_")) %>% 
+  mutate(year = as.numeric(year))
+
+lifeexpectancy <- merge(final, le, by.x = c("iso3", "year"), by.y = c("iso3", "year")) %>% 
+  filter(year == 2021)
+
+geo1 <- countries %>% 
+  select(admin, iso_a3, subregion, region_wb)
+
+life_expectancy2 <- merge(lifeexpectancy, geo1, by.x = "iso3", by.y = "iso_a3")
+
+```
+
+
+```{r}
+
+ggplotly(
+  ggplot(life_expectancy2, aes(x = HDI,
+             y = WHR)) +
+    geom_point(size = life_expectancy2$life_expectancy,
+               #color = life_expectancy2$subregion,
+               text = life_expectancy2$country_name) +
+    ylab("World Happiness Record") +
+    xlab("Human Development Index") +
+    labs(title  = "Human Development Index vs World Happiness Record") 
+)
+
+life_expectancy2 <- life_expectancy2 %>% 
+  filter(subregion %in% c("Southern Asia", "Central Asia", "Western Asia", "Eastern Asia",
+                          "South-Eastern Asia", "Australia and New Zealand"))
+
+ggplotly(
+  ggplot(life_expectancy2, aes(x=HDI, 
+                          y=WHR, 
+                          size=life_expectancy, 
+                          color=subregion, 
+                          text = country_name)) +
+    geom_point(alpha=0.5) +
+    scale_size(range = c(.1, 12), name="Subregion") +
+    ylab("WHR") +
+    xlab("HDI") +
+    labs(title  = "Wellbeing") +
+    scale_y_continuous(labels = scales::label_percent(scale = 1)) +
+    scale_x_continuous(labels = scales::label_percent(scale = 1))
+  )
 
 
 
 
+```
 
 
 
