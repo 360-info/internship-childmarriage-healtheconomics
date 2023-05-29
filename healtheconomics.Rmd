@@ -40,8 +40,6 @@ hdi_timeseries <- hdi_timeseries %>%
   mutate(year = str_remove_all(year, "hdi_")) %>% 
   mutate(year = as.numeric(year))
 
-hdi_timeseries
-
 whr <- read_excel("data/healtheconomics/wellbeing-otherfactos.xls")
 
 whr <- whr %>% 
@@ -65,28 +63,15 @@ geo <- countries %>%
 
 combined <- merge(final1, geo, by.x = "iso3", by.y = "iso_a3")
 
+
+```
+
+
+```{r}
+
+
 southasia <- combined %>% 
   filter( subregion == "Southern Asia")
-
-```
-
-```{r}
-
-base = southasia %>% 
-  ggplot(aes(x= year, y = score, color = organisation)) +
-  geom_line() +
-  geom_point() +
-  theme(legend.position = "bottom")
-
-ggplotly(base + facet_wrap(~country_name, nrow = 4))
-
-unique(combined$subregion)
-
-
-```
-
-
-```{r}
 
 centralasia <- combined %>% 
   filter( subregion == "Central Asia")
@@ -103,10 +88,101 @@ seasia <- combined %>%
 ausnz <- combined %>% 
   filter( subregion == "Australia and New Zealand")
 
-carribean <- combined %>% 
-  filter( subregion == "Caribbean")
+```
+
+```{r}
+
+ggplotly(
+  southasia %>% 
+    ggplot(aes(x = year, 
+               y = score, 
+               color = organisation)) +
+    geom_line() +
+    geom_point() +
+    theme(legend.position = "bottom") + 
+    facet_wrap( ~ country_name, 
+                nrow = 4))
+
 
 ```
+
+
+```{r}
+
+ggplotly(
+  centralasia %>% 
+    ggplot(aes(x = year, 
+               y = score, 
+               color = organisation)) +
+    geom_line() +
+    geom_point() +
+    theme(legend.position = "bottom") + 
+    facet_wrap( ~ country_name, 
+                nrow = 4))
+
+```
+
+
+```{r}
+
+ggplotly(
+  westernasia %>% 
+    ggplot(aes(x = year, 
+               y = score, 
+               color = organisation)) +
+    geom_line() +
+    geom_point() +
+    theme(legend.position = "bottom") + 
+    facet_wrap( ~ country_name, 
+                ncol = 3))
+
+```
+
+```{r}
+
+ggplotly(
+  easternasia %>% 
+    ggplot(aes(x = year, 
+               y = score, 
+               color = organisation)) +
+    geom_line() +
+    geom_point() +
+    theme(legend.position = "bottom") + 
+    facet_wrap( ~ country_name, 
+                nrow = 4))
+
+```
+
+```{r}
+
+ggplotly(
+  seasia %>% 
+    ggplot(aes(x = year, 
+               y = score, 
+               color = organisation)) +
+    geom_line() +
+    geom_point() +
+    theme(legend.position = "bottom") + 
+    facet_wrap( ~ country_name, 
+                ncol = 3))
+
+```
+
+```{r}
+
+ggplotly(
+  ausnz %>% 
+    ggplot(aes(x = year, 
+               y = score, 
+               color = organisation)) +
+    geom_line() +
+    geom_point() +
+    theme(legend.position = "bottom") + 
+    facet_wrap( ~ country_name, 
+                nrow = 4))
+
+```
+
 
 ```{r}
 
@@ -139,17 +215,6 @@ life_expectancy2 <- merge(lifeexpectancy, geo1, by.x = "iso3", by.y = "iso_a3")
 
 ```{r}
 
-ggplotly(
-  ggplot(life_expectancy2, aes(x = HDI,
-             y = WHR)) +
-    geom_point(size = life_expectancy2$life_expectancy,
-               #color = life_expectancy2$subregion,
-               text = life_expectancy2$country_name) +
-    ylab("World Happiness Record") +
-    xlab("Human Development Index") +
-    labs(title  = "Human Development Index vs World Happiness Record") 
-)
-
 life_expectancy2 <- life_expectancy2 %>% 
   filter(subregion %in% c("Southern Asia", "Central Asia", "Western Asia", "Eastern Asia",
                           "South-Eastern Asia", "Australia and New Zealand"))
@@ -161,18 +226,83 @@ ggplotly(
                           color=subregion, 
                           text = country_name)) +
     geom_point(alpha=0.5) +
-    scale_size(range = c(.1, 12), name="Subregion") +
+    scale_size(range = c(.1, 15), name="Subregion") +
     ylab("WHR") +
     xlab("HDI") +
     labs(title  = "Wellbeing") +
     scale_y_continuous(labels = scales::label_percent(scale = 1)) +
-    scale_x_continuous(labels = scales::label_percent(scale = 1))
+    scale_x_continuous(labels = scales::label_percent(scale = 1)) + 
+    theme_bw()
   )
 
 
 
 
 ```
+
+
+```{r}
+
+ggplotly(
+  combined %>% 
+    filter(country_name == 
+             'India') %>% 
+    ggplot(aes(x = year, 
+               y = score, 
+               color = organisation)) +
+    geom_line() +
+    geom_point() +
+    theme(legend.position = "bottom")
+)
+
+
+```
+
+
+```{r}
+
+ggplotly(
+  combined %>% 
+    filter(country_name == 
+             'Pakistan') %>% 
+    ggplot(aes(x = year, 
+               y = score, 
+               color = organisation)) +
+    geom_line() +
+    geom_point() +
+    theme(legend.position = "bottom")
+)
+
+```
+
+```{r}
+
+ggplotly(
+  combined %>% 
+    filter(country_name == 
+             'Indonesia') %>% 
+    ggplot(aes(x = year, 
+               y = score, 
+               color = organisation)) +
+    geom_line() +
+    geom_point() +
+    theme(legend.position = "bottom")
+)
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
