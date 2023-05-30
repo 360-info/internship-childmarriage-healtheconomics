@@ -24,10 +24,10 @@ library(themes360info)
 
 ```{r readdata}
 
-<<<<<<< HEAD
+
 hdi <- read_excel("data/healtheconomics/hdi.xlsx")
 
-=======
+
 hdi_timeseries <- read_csv("data/healtheconomics/hdi_timeseries.csv")
 
 hdi_timeseries <- hdi_timeseries %>% 
@@ -44,13 +44,12 @@ hdi_timeseries <- hdi_timeseries %>%
   mutate(year = str_remove_all(year, "hdi_")) %>% 
   mutate(year = as.numeric(year))
 
->>>>>>> 1b1e7a9d38afc044f334cb6e152fcf4eac444a69
+
 whr <- read_excel("data/healtheconomics/wellbeing-otherfactos.xls")
 
 whr <- whr %>% 
   clean_names()
 
-<<<<<<< HEAD
 hdi <- hdi %>% 
   clean_names()
 
@@ -62,7 +61,7 @@ combined <- whr %>%
 
 final <- combined %>% 
   select(country_name, year, score,)
-=======
+
 whr <- whr %>% 
   mutate(WHR = life_ladder/10)
 
