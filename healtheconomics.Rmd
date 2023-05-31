@@ -6,7 +6,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 ```
 
 ```{r package}
@@ -99,6 +99,8 @@ ausnz <- subcon %>%
 
 ```
 
+# South Asia Analysis
+
 ```{r southasia}
 
 ggplotly(
@@ -120,6 +122,7 @@ ggplotly(
 
 ```
 
+# Middle-East Asia Analysis
 
 ```{r middleeast}
 
@@ -141,6 +144,8 @@ ggplotly(
 
 ```
 
+# East Asia Analysis
+
 ```{r east}
 
 ggplotly(
@@ -160,6 +165,8 @@ ggplotly(
 )
 
 ```
+
+# South-East Asia analysis
 
 ```{r southeast}
 
@@ -181,8 +188,9 @@ ggplotly(
 
 ```
 
-```{r ausnz}
+# Pacific Region Analysis
 
+```{r ausnz}
 
 ggplotly(
   ausnz %>%
@@ -202,7 +210,32 @@ ggplotly(
 
 ```
 
+
+# Happiness Score Factors Data
+
 ```{r}
+
+whrfactor <- import_list("data/healtheconomics/2015_a.xlsx" , rbind=TRUE)
+
+whrfactor <- whrfactor %>% 
+  select(-`_file`)
+
+whrfactor <- whrfactor %>% 
+  pivot_longer(
+    cols = 2:9,
+    names_to = "factor",
+    values_to = "value"
+  )
+
+
+```
+
+
+# Human Development Index Factors
+
+```{r}
+
+# Life Expectancy Data
 
 le <- read_excel("data/healtheconomics/le.xlsx")
 
@@ -216,6 +249,139 @@ le <- le %>%
   mutate(year = str_remove_all(year, "le_")) %>%
   mutate(year = as.numeric(year)) %>%
   filter(year > 2014)
+
+
+# Gross National Income Per Capita
+
+gnipc <- read_excel("data/healtheconomics/gnipic.xlsx")
+
+gnipc <- gnipc %>%
+  pivot_longer(cols = 5:36,
+               names_to = "year",
+               values_to = "GNIPC")
+
+gnipc <- gnipc %>%
+  select(c(-hdicode)) %>%
+  mutate(year = str_remove_all(year, "gnipc_")) %>%
+  mutate(year = as.numeric(year)) %>%
+  filter(year > 2014)
+
+hdifactor <-
+  inner_join(le, gnipc, by = c("year", "country", "iso3"))
+
+
+# Expected years of Schooling
+
+eys <- read_excel("data/healtheconomics/eys.xlsx")
+
+eys <- eys %>%
+  pivot_longer(cols = 5:36,
+               names_to = "year",
+               values_to = "eys")
+
+eys <- eys %>%
+  mutate(year = str_remove_all(year, "eys_")) %>%
+  mutate(year = as.numeric(year)) %>%
+  select(c(-hdicode)) %>%
+  filter(year > 2014)
+
+hdifactor <-
+  inner_join(hdifactor, eys, by = c("year", "country", "iso3", "region"))
+
+
+# Mean Years of Schooling
+
+mys <- read_excel("data/healtheconomics/mys.xlsx")
+
+mys <- mys %>%
+  pivot_longer(cols = 5:36,
+               names_to = "year",
+               values_to = "mys")
+
+mys <- mys %>%
+  mutate(year = str_remove_all(year, "mys_")) %>%
+  mutate(year = as.numeric(year)) %>%
+  select(c(-hdicode)) %>%
+  filter(year > 2014)
+
+hdifactor <-
+  inner_join(hdifactor, mys, by = c("year", "country", "iso3", "region"))
+
+hdifactor <-
+  inner_join(hdifactor, hdi, by = c("year", "country", "iso3"))
+
+hdifactor <- hdifactor %>%
+  mutate(logGNI = log(GNIPC)) %>%
+  mutate(lifeexp = life_expectancy / 10) %>%
+  select(-region,-GNIPC,-life_expectancy)
+
+hdifactor <- hdifactor %>%
+  pivot_longer(cols = 4:8,
+               names_to = "factor",
+               values_to = "value")
+
+```
+
+# Comparison of HDI and WHR with contributing factors
+
+```{r}
+
+a <- ggplotly(
+  hdifactor %>% 
+    filter(country == 
+             'Indonesia') %>% 
+    ggplot(aes(x = year, 
+               y = value, 
+               color = factor)) +
+    geom_line() +
+    geom_point() +
+    theme_bw() +
+    scale_color_brewer(palette = "Dark2")
+)
+
+b <- ggplotly(
+  whrfactor %>% 
+    filter(country == 
+             'Indonesia') %>% 
+    ggplot(aes(x = year, 
+               y = value, 
+               color = factor)) +
+    geom_line() +
+    geom_point() +
+    theme_bw() +
+    scale_color_brewer(palette = "Dark2")
+)
+
+subplot(a,b)
+
+```
+
+
+# WHR Factors - Stacked Bar Chart
+
+```{r}
+
+whrfac <- whrfactor %>%
+  filter(factor != c("residual", "score"))
+
+indonesiawhr <- whrfac %>%
+  filter(country == "Pakistan")
+
+indonesiascore <- whrfactor %>%
+  filter(factor == "score", country == "Pakistan")
+
+ggplotly(
+  ggplot(indonesiawhr, aes(
+    fill = factor, x = year, y = value
+  )) +
+    scale_fill_brewer(palette = "Paired") +
+    geom_bar(position = "stack", stat = "identity") +
+    labs(title = "World Happiness Score : Factor composition") +
+    theme_bw() +
+    theme(legend.position = "top") +
+    geom_line(data = indonesiascore, aes(x = year, y = value)) +
+    geom_point(data = indonesiascore)
+)
 
 
 ```
@@ -272,186 +438,6 @@ ggplotly(
 )
 
 ```
-
-
-```{r}
-
-data <- import_list("data/healtheconomics/2015_a.xlsx" , rbind=TRUE)
-
-factors <- data %>% 
-  pivot_longer(
-    cols = 2:7,
-    names_to = "factors",
-    values_to = "value"
-  )
-
-factors <- factors %>% 
-  select(-`_file`)
-
-factor <- merge(factors, geo, by.x = "country", by.y = "admin")
-
-whr <- whr %>% 
-  select(country_name, year, WHR)
-
-happiness <- inner_join(whr, data, by = join_by("country_name" == "country", "year" == "year"))
-
-happiness <- happiness %>% 
-   pivot_longer(
-    cols = 3:9,
-    names_to = "factor",
-    values_to = "value"
-  )
-
-```
-
-```{r}
-
-
-gnipc <- read_excel("data/healtheconomics/gnipic.xlsx")
-
-gnipc <- gnipc %>% 
-  pivot_longer(
-    cols = 5:36,
-    names_to = "year",
-    values_to = "GNIPC"
-  )
-
-gnipc <- gnipc %>% 
-  select(c(-hdicode)) %>% 
-  mutate(year = str_remove_all(year, "gnipc_")) %>% 
-  mutate(year = as.numeric(year)) %>% 
-  filter(year > 2014)
-
-hdifactor <- inner_join(le, gnipc, by = c("year", "country", "iso3"))
-
-```
-
-
-```{r}
-
-eys <- read_excel("data/healtheconomics/eys.xlsx")
-
-eys <- eys %>% 
-  pivot_longer(
-    cols = 5:36,
-    names_to = "year",
-    values_to = "eys"
-  )
-
-eys <- eys %>% 
-  mutate(year = str_remove_all(year, "eys_")) %>% 
-  mutate(year = as.numeric(year)) %>% 
-  select(c(-hdicode)) %>% 
-  filter(year > 2014)
-
-hdifactor <- inner_join(hdifactor, eys, by = c("year", "country", "iso3", "region"))
-
-```
-
-```{r}
-
-mys <- read_excel("data/healtheconomics/mys.xlsx")
-
-mys <- mys %>% 
-  pivot_longer(
-    cols = 5:36,
-    names_to = "year",
-    values_to = "mys"
-  )
-
-mys <- mys %>% 
-  mutate(year = str_remove_all(year, "mys_")) %>% 
-  mutate(year = as.numeric(year)) %>% 
-  select(c(-hdicode)) %>% 
-  filter(year > 2014)
-
-hdifactor <- inner_join(hdifactor, mys, by = c("year", "country", "iso3", "region"))
-
-hdifactor <- inner_join(hdifactor, hdi_timeseries, by = c("year", "country", "iso3"))
-
-hdifactor <- hdifactor %>% 
-  mutate(logGNI = log(GNIPC)) %>% 
-  mutate(lifeexp = life_expectancy/10) %>% 
-  select(-region, -GNIPC, -life_expectancy)
-
-hdifactor <- hdifactor %>% 
-  pivot_longer(
-    cols = 4:8,
-    names_to = "factor",
-    values_to = "value"
-  )
-
-```
-
-```{r}
-
-a <- ggplotly(
-  hdifactor %>% 
-    filter(country == 
-             'Indonesia') %>% 
-    ggplot(aes(x = year, 
-               y = value, 
-               color = factor)) +
-    geom_line() +
-    geom_point() +
-    theme_bw() +
-    scale_color_brewer(palette = "Dark2")
-)
-
-b <- ggplotly(
-  happiness %>% 
-    filter(country_name == 
-             'Indonesia') %>% 
-    ggplot(aes(x = year, 
-               y = value, 
-               color = factor)) +
-    geom_line() +
-    geom_point() +
-    theme_bw() +
-    scale_color_brewer(palette = "Dark2")
-)
-
-subplot(a,b)
-
-```
-
-```{r}
-
-whrfactor <- import_list("data/healtheconomics/2015_a.xlsx" , rbind=TRUE)
-
-whrfactor <- whrfactor %>% 
-  select(-`_file`)
-
-whrfactor <- whrfactor %>% 
-  pivot_longer(
-    cols = 2:9,
-    names_to = "factor",
-    values_to = "value"
-  )
-
-whrfac <- whrfactor %>% 
-  filter(factor != c("residual","score"))
-
-indonesiawhr <- whrfac %>% 
-  filter(country == "India")
-
-indonesiascore <- whrfactor %>% 
-  filter(factor == "score", country == "India")
-
-ggplotly(
-  ggplot(indonesiawhr, aes(fill=factor, x=year, y=value)) + 
-  scale_fill_brewer(palette = "Dark2") +
-  geom_bar(position="stack", stat="identity") +
-  theme_bw() +
-  theme(legend.position = "top") + 
-    geom_line(data = indonesiascore, aes(x = year, y = value)) +
-    geom_point(data = indonesiascore)
-)
-
-
-```
-
-
 
 
 

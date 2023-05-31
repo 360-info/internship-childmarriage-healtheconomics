@@ -144,10 +144,7 @@ ggplot(
     legend.direction = "horizontal",
     legend.key.width = unit(1, "cm")
   )
-
-theme_360()
 ```
-
 
 ```{r india}
 
@@ -167,7 +164,7 @@ ggplot(
   geom_line(size = 1) +
   geom_point(size = 2) +
   labs(
-    title = "WELLBEING ECONOMICS: INDIA",
+    title = "Wellbeing Economics: India",
     subtitle = "Comparing Human Development Index with World Happiness Score",
     color = "Organisation",
     x = "Year",
@@ -204,7 +201,7 @@ ggplot(
   geom_line(size = 1) +
   geom_point(size = 2) +
   labs(
-    title = "WELLBEING ECONOMICS: PAKISTAN",
+    title = "Wellbeing Economics: Pakistan",
     subtitle = "Comparing Human Development Index with World Happiness Score",
     color = "Organisation",
     x = "Year",
@@ -216,6 +213,16 @@ ggplot(
     )
   ) +
   theme_360() +
+  annotate_360_light(
+    x = 2017,
+    y = 0.52,
+    label = paste(
+      "Happiness score is more than ", 
+      "Human Development Index for 2019", 
+      sep = "<br>"
+    ),
+    size = 2
+  ) +
   theme(
     legend.position = "top",
     legend.direction = "horizontal",
@@ -278,7 +285,7 @@ ggplot(
   geom_line(size = 1) +
   geom_point(size = 2) +
   labs(
-    title = "WELLBEING ECONOMICS: THAILAND",
+    title = "Wellbeing Economics: Thailand",
     subtitle = "Comparing Human Development Index with World Happiness Score",
     color = "Organisation",
     x = "Year",
@@ -315,7 +322,7 @@ ggplot(
   geom_line(size = 1) +
   geom_point(size = 2) +
   labs(
-    title = "WELLBEING ECONOMICS: SINGAPORE",
+    title = "Wellbeing Economics: Singapore",
     subtitle = "Comparing Human Development Index with World Happiness Score",
     color = "Organisation",
     x = "Year",
@@ -352,7 +359,7 @@ ggplot(
   geom_line(size = 1) +
   geom_point(size = 2) +
   labs(
-    title = "WELLBEING ECONOMICS: MYANMAR",
+    title = "Wellbeing Economics: Myanmar",
     subtitle = "Comparing Human Development Index with World Happiness Score",
     color = "Organisation",
     x = "Year",
@@ -389,7 +396,7 @@ ggplot(
   geom_line(size = 1) +
   geom_point(size = 2) +
   labs(
-    title = "WELLBEING ECONOMICS: AUSTRALIA",
+    title = "Wellbeing Economics: Australia",
     subtitle = "Comparing Human Development Index with World Happiness Score",
     color = "Organisation",
     x = "Year",
@@ -408,6 +415,40 @@ ggplot(
   )
 ```
 
+
+```{r nz}
+
+# New Zealand
+
+nz <- comparison %>%
+  filter(country_name == "New Zealand")
+
+ggplot(data = nz,
+       aes(x = year,
+           y = score,
+           color = organisation)) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  labs(
+    title = "Wellbeing Economics: New Zealand",
+    subtitle = "Comparing Human Development Index with World Happiness Score",
+    color = "Organisation",
+    x = "Year",
+    y = "Score",
+    caption = paste(
+      "**CHART:** Ambalika Gupta & James Goldie, 360info",
+      "**DATA:** UNDP & World Happiness Report",
+      sep = "\n"
+    )
+  ) +
+  theme_360() +
+  theme(
+    legend.position = "top",
+    legend.direction = "horizontal",
+    legend.key.width = unit(1, "cm")
+  )
+
+```
 
 
 
