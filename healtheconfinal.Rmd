@@ -1,12 +1,12 @@
 ---
 title: "healthecon"
 author: "Ambalika"
-date: "2023-04-12"
+date: sys.date
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, warning = FALSE)
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 ```
 
 ```{r package}
@@ -24,6 +24,7 @@ library(rio)
 ```
 
 ```{r read data}
+
 # Reading HDI data
 
 hdi <- read_csv("data/healtheconomics/hdi_timeseries.csv")
@@ -67,7 +68,7 @@ comparison$organisation[comparison$organisation == "HDI"] <- "Human Development 
 
 ```
 
-```{r countrywise}
+```{r nz}
 
 # New Zealand
 
@@ -99,9 +100,12 @@ ggplot(data = nz,
     legend.key.width = unit(1, "cm")
   )
 
+theme_360()
+
 ```
 
-```{r}
+
+```{r india}
 
 # India
 
@@ -135,7 +139,7 @@ ggplot(data = india,
 
 ```
 
-```{r}
+```{r paki}
 
 # Pakistan
 
@@ -169,7 +173,7 @@ ggplot(data = pakistan,
 
 ```
 
-```{r}
+```{r indonesia}
 
 # Indonesia
 
@@ -183,7 +187,7 @@ ggplot(data = indonesia,
   geom_line(size = 1) +
   geom_point(size = 2) +
   labs(
-    title = "WELLBEING ECONOMICS: INDONESIA",
+    title = "Wellbeing Economics: Indonesia",
     subtitle = "Comparing Human Development Index with World Happiness Score",
     color = "Organisation",
     x = "Year",
@@ -203,7 +207,7 @@ ggplot(data = indonesia,
 
 ```
 
-```{r}
+```{r thai}
 
 # Thailand
 
@@ -237,7 +241,7 @@ ggplot(data = thailand,
 
 ```
 
-```{r}
+```{r sgp}
 
 # Singapore
 
@@ -271,7 +275,7 @@ ggplot(data = singapore,
 
 ```
 
-```{r}
+```{r myanmar}
 
 # Myanmar
 
@@ -304,7 +308,7 @@ ggplot(data = myanmar,
   )
 ```
 
-```{r}
+```{r aus}
 
 # Australia
 
@@ -335,10 +339,6 @@ ggplot(data = aus,
     legend.direction = "horizontal",
     legend.key.width = unit(1, "cm")
     ) 
-
-```
-
-```{r}
 
 ```
 

@@ -25,177 +25,180 @@ library(rio)
 
 ```{r readdata}
 
-hdi_timeseries <- read_csv("data/healtheconomics/hdi_timeseries.csv")
+# Reading HDI data
 
-hdi_timeseries <- hdi_timeseries %>% 
-  pivot_longer(
-    cols = 6:37,
-    names_to = "year",
-    values_to = "HDI"
-  )
+hdi <- read_csv("data/healtheconomics/hdi_timeseries.csv")
 
-hdi_timeseries <- hdi_timeseries %>% 
-  select(c(-region, -hdicode, -hdi_rank_2021)) %>% 
-  mutate(year = str_remove_all(year, "hdi_")) %>% 
-  mutate(year = as.numeric(year)) %>% 
+hdi <- hdi %>%
+  pivot_longer(cols = 6:37,
+               names_to = "year",
+               values_to = "HDI")
+
+hdi <- hdi %>%
+  select(c(-region, -hdicode, -hdi_rank_2021)) %>%
+  mutate(year = str_remove_all(year, "hdi_")) %>%
+  mutate(year = as.numeric(year)) %>%
   filter(year > 2014)
 
-
-hdif <- read_excel("data/healtheconomics/hdi.xlsx")
-
-hdif <- hdif %>% 
-  clean_names()
+# Reading WHR(World Happiness Record) data
 
 whr <- read_excel("data/healtheconomics/wellbeing-otherfactos.xls")
 
-whr <- whr %>% 
-  clean_names()
+whr <- whr %>%
+  clean_names() %>%
+  mutate(WHR = life_ladder / 10)
 
-whr <- whr %>% 
-  mutate(score = life_ladder/10)
+# Comparison data
 
-combined <- whr %>% 
-  left_join(hdi, by = c("country_name" = "country"))
+comparisonf <- whr %>%
+  left_join(hdi, by = c("country_name" = "country", "year"))
 
-final <- combined %>% 
-  select(country_name, year, score)
-
-whr <- whr %>% 
-  mutate(WHR = life_ladder/10)
-
-final <- merge(whr, hdi_timeseries, by.x = c("country_name", "year"), by.y = c("country", "year")) %>% 
+comparisonf <-
+  merge(
+    whr,
+    hdi,
+    by.x = c("country_name", "year"),
+    by.y = c("country", "year")
+  ) %>%
   select(country_name, year, 13:15)
 
-final1 <- final %>% 
-  pivot_longer(cols = c(3,4),
+comparison <- comparisonf %>%
+  pivot_longer(cols = c(3, 5),
                names_to = "organisation",
                values_to = "score")
 
-countries <- ne_countries(returnclass = "sf", scale = "medium")
+comparison$organisation[comparison$organisation == "WHR"] <-
+  "Happiness Score"
+comparison$organisation[comparison$organisation == "HDI"] <-
+  "Human Development Index"
 
-geo <- countries %>% 
+# For subcontinental comparison
+
+subcon <- ne_countries(returnclass = "sf", scale = "medium") %>%
   select(admin, iso_a3, subregion, region_wb)
 
-combined <- merge(final1, geo, by.x = "iso3", by.y = "iso_a3")
+subcon <- merge(comparison, subcon, by.x = "iso3", by.y = "iso_a3")
 
+southasia <- subcon %>%
+  filter(subregion == "Southern Asia")
 
-```
+centralasia <- subcon %>%
+  filter(subregion == "Central Asia")
 
+westernasia <- subcon %>%
+  filter(subregion == "Western Asia")
 
-```{r}
+easternasia <- subcon %>%
+  filter(subregion == "Eastern Asia")
 
+seasia <- subcon %>%
+  filter(subregion == "South-Eastern Asia")
 
-southasia <- combined %>% 
-  filter( subregion == "Southern Asia")
-
-centralasia <- combined %>% 
-  filter( subregion == "Central Asia")
-
-westernasia <- combined %>% 
-  filter( subregion == "Western Asia")
-
-easternasia <- combined %>% 
-  filter( subregion == "Eastern Asia")
-
-seasia <- combined %>% 
-  filter( subregion == "South-Eastern Asia")
-
-ausnz <- combined %>% 
-  filter( subregion == "Australia and New Zealand")
+ausnz <- subcon %>%
+  filter(subregion == "Australia and New Zealand")
 
 ```
 
-```{r}
+```{r southasia}
 
 ggplotly(
-  southasia %>% 
-    ggplot(aes(x = year, 
-               y = score, 
-               color = organisation)) +
+  southasia %>%
+    ggplot(aes(
+      x = year,
+      y = score,
+      color = organisation
+    )) +
     geom_line() +
     geom_point() +
-    theme(legend.position = "bottom") + 
-    facet_wrap( ~ country_name, 
-                nrow = 4))
+    labs(title = "Wellbeing Economics in South Asia" , x = "Year", y = "Score") +
+    theme(legend.position = "bottom") +
+    theme_bw() +
+    facet_wrap( ~ country_name,
+                nrow = 4)
+)
 
 
 ```
 
 
-```{r}
+```{r middleeast}
 
 ggplotly(
-  centralasia %>% 
-    ggplot(aes(x = year, 
-               y = score, 
-               color = organisation)) +
+  westernasia %>%
+    ggplot(aes(
+      x = year,
+      y = score,
+      color = organisation
+    )) +
     geom_line() +
     geom_point() +
-    theme(legend.position = "bottom") + 
-    facet_wrap( ~ country_name, 
-                nrow = 4))
-
+    labs(title = "Wellbeing Economics in Middle-East Asia" , x = "Year", y = "Score") +
+    theme(legend.position = "bottom") +
+    theme_bw() +
+    facet_wrap(~ country_name,
+               ncol = 3)
+)
 
 ```
 
-
-```{r}
+```{r east}
 
 ggplotly(
-  westernasia %>% 
-    ggplot(aes(x = year, 
-               y = score, 
-               color = organisation)) +
+  easternasia %>%
+    ggplot(aes(
+      x = year,
+      y = score,
+      color = organisation
+    )) +
     geom_line() +
     geom_point() +
-    theme(legend.position = "bottom") + 
-    facet_wrap( ~ country_name, 
-                ncol = 3))
+    labs(title = "Wellbeing Economics in East Asia" , x = "Year", y = "Score") +
+    theme(legend.position = "bottom") +
+    theme_bw() +
+    facet_wrap( ~ country_name,
+                nrow = 4)
+)
 
 ```
 
-```{r}
+```{r southeast}
 
 ggplotly(
-  easternasia %>% 
-    ggplot(aes(x = year, 
-               y = score, 
-               color = organisation)) +
+  seasia %>%
+    ggplot(aes(
+      x = year,
+      y = score,
+      color = organisation
+    )) +
     geom_line() +
     geom_point() +
-    theme(legend.position = "bottom") + 
-    facet_wrap( ~ country_name, 
-                nrow = 4))
+    labs(title = "Wellbeing Economics in South-East Asia" , x = "Year", y = "Score") +
+    theme(legend.position = "bottom") +
+    theme_bw() +
+    facet_wrap( ~ country_name,
+                ncol = 3)
+)
 
 ```
 
-```{r}
+```{r ausnz}
+
 
 ggplotly(
-  seasia %>% 
-    ggplot(aes(x = year, 
-               y = score, 
-               color = organisation)) +
+  ausnz %>%
+    ggplot(aes(
+      x = year,
+      y = score,
+      color = organisation
+    )) +
     geom_line() +
     geom_point() +
-    theme(legend.position = "bottom") + 
-    facet_wrap( ~ country_name, 
-                ncol = 3))
-
-```
-
-```{r}
-
-ggplotly(
-  ausnz %>% 
-    ggplot(aes(x = year, 
-               y = score, 
-               color = organisation)) +
-    geom_line() +
-    geom_point() +
-    theme(legend.position = "bottom") + 
-    facet_wrap( ~ country_name, 
-                nrow = 4))
+    labs(title = "Wellbeing Economics in Pacific Region" , x = "Year", y = "Score") +
+    theme(legend.position = "bottom") +
+    theme_bw() +
+    facet_wrap(~ country_name,
+               nrow = 4)
+)
 
 ```
 
@@ -203,114 +206,72 @@ ggplotly(
 
 le <- read_excel("data/healtheconomics/le.xlsx")
 
-le <- le %>% 
-  pivot_longer(
-    cols = 4:35,
-    names_to = "year",
-    values_to = "life_expectancy"
-  )
+le <- le %>%
+  pivot_longer(cols = 4:35,
+               names_to = "year",
+               values_to = "life_expectancy")
 
-le <- le %>% 
-  select(c(-hdicode)) %>% 
-  mutate(year = str_remove_all(year, "le_")) %>% 
-  mutate(year = as.numeric(year)) %>% 
+le <- le %>%
+  select(c(-hdicode)) %>%
+  mutate(year = str_remove_all(year, "le_")) %>%
+  mutate(year = as.numeric(year)) %>%
   filter(year > 2014)
 
 
 ```
 
 
+# HDI vs WHR with life expectancy for Asia Pacific Region
+
 ```{r}
 
-lifeexpectancy <- merge(final, le, by.x = c("iso3", "year"), by.y = c("iso3", "year")) %>% 
+le2021 <-
+  merge(comparisonf,
+        le,
+        by.x = c("iso3", "year"),
+        by.y = c("iso3", "year")) %>%
   filter(year == 2021)
 
-geo1 <- countries %>% 
+geo <- ne_countries(returnclass = "sf", scale = "medium") %>%
   select(admin, iso_a3, subregion, region_wb)
 
-life_expectancy2 <- merge(lifeexpectancy, geo1, by.x = "iso3", by.y = "iso_a3")
+le2021 <- merge(le2021, geo, by.x = "iso3", by.y = "iso_a3")
 
-```
-
-
-```{r}
-
-life_expectancy2 <- life_expectancy2 %>% 
-  filter(subregion %in% c("Southern Asia", "Central Asia", "Western Asia", "Eastern Asia",
-                          "South-Eastern Asia", "Australia and New Zealand"))
+le2021 <- le2021 %>%
+  filter(
+    subregion %in% c(
+      "Southern Asia",
+      "Central Asia",
+      "Western Asia",
+      "Eastern Asia",
+      "South-Eastern Asia",
+      "Australia and New Zealand"
+    )
+  )
 
 ggplotly(
-  ggplot(life_expectancy2, aes(x=HDI, 
-                          y=WHR, 
-                          size=life_expectancy, 
-                          color=subregion, 
-                          text = country_name)) +
-    geom_point(alpha=0.5) +
-    scale_size(range = c(.1, 12), name="Subregion") +
+  ggplot(
+    le2021,
+    aes(
+      x = HDI,
+      y = WHR,
+      size = life_expectancy,
+      color = subregion,
+      text = country_name
+    )
+  ) +
+    labs(title = "HDI vs WHR with life expectancy for Asia Pacific Region") +
+    geom_point(alpha = 0.5) +
+    scale_size(range = c(.1, 12), name = "Subregion") +
     ylab("WHR") +
     xlab("HDI") +
     labs(title  = "Wellbeing") +
     scale_y_continuous(labels = scales::label_percent(scale = 1)) +
-    scale_x_continuous(labels = scales::label_percent(scale = 1))
-  )
-
-
-
-
-```
-
-
-```{r}
-
-ggplotly(
-  combined %>% 
-    filter(country_name == 
-             'India') %>% 
-    ggplot(aes(x = year, 
-               y = score, 
-               color = organisation)) +
-    geom_line() +
-    geom_point() +
-    theme(legend.position = "bottom")
-)
-
-
-```
-
-
-```{r}
-
-ggplotly(
-  combined %>% 
-    filter(country_name == 
-             'Pakistan') %>% 
-    ggplot(aes(x = year, 
-               y = score, 
-               color = organisation)) +
-    geom_line() +
-    geom_point() +
-    theme(legend.position = "bottom")
+    scale_x_continuous(labels = scales::label_percent(scale = 1)) +
+    scale_color_brewer(palette = "Dark2")
 )
 
 ```
-
-```{r}
-
-ggplotly(
-  combined %>% 
-    filter(country_name == 
-             'Indonesia') %>% 
-    ggplot(aes(x = year, 
-               y = score, 
-               color = organisation)) +
-    geom_line() +
-    geom_point() +
-    theme(legend.position = "bottom")
-)
-
-
-```
-
 
 
 ```{r}
