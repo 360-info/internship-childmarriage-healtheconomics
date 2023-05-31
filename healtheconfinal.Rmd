@@ -22,7 +22,7 @@ library(themes360info)
 library(rio)
 ```
 
-```{r read data}
+```{r readdata}
 
 # Reading HDI data
 
