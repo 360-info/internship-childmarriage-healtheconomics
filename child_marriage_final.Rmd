@@ -49,11 +49,12 @@ cmf1 <- countries %>%
 cmf1 %>%
   mutate(
     LawStr = case_when(
-      Law == 0 ~ "Prohibited",
-      Law == 0.25 ~ "Prohibited with legal exceptions",
-      Law == 0.5 ~  "Prohibited with legal exceptions for girls",
+      Law == 0    ~ "Prohibited",
+      Law == 0.25 ~
+        "Prohibited, but encouraged\nby some customary or\ntraditional laws",
+      Law == 0.5  ~ "Prohibited, but with legal\nexceptions around consent or\nsome groups of women",
       Law == 0.75 ~ "Allowed",
-      Law == 1 ~ "Allowed for girls")) ->
+      Law == 1    ~ "Allowed for girls only")) ->
   cmf1
 
 
@@ -71,8 +72,7 @@ rate_map <- ggplot() +
     data = cmf1,
     stat = "sf",
     position = "identity",
-    colour = "black",
-    expand = TRUE
+    colour = "black"
     ) +
   scale_fill_fermenter(
     name = NULL,
@@ -89,10 +89,13 @@ rate_map <- ggplot() +
       sep = "<br>")) +
   theme_360() +
   theme(
-    legend.position = "top",
-    legend.direction = "horizontal",
-    legend.key.width = unit(2, "cm"),
-    panel.grid = element_blank()
+    legend.position = c(0.15, 0.45),
+    legend.direction = "vertical",
+    legend.box = "horizontal",
+    legend.key.width = unit(1, "cm"),
+    legend.text = element_text(face = "bold"),
+    panel.grid = element_blank(),
+    plot.margin = margin()
   )
 
 save_360plot(rate_map, "rate_map.png", retina = 4, shape = "sdtv-landscape")
@@ -104,8 +107,7 @@ save_360plot(rate_map, "rate_map.png", retina = 4, shape = "sdtv-landscape")
 ```{r}
 
 combined_map <- ggplot() +
-  geom_sf(data = countries,
-          mapping = aes(fill = NULL)) +
+  geom_sf(data = countries, fill = "grey", colour = "#00000066", size = 0.25) +
   geom_sf_pattern(
     mapping = aes(
       pattern_spacing = LawStr,
@@ -117,34 +119,44 @@ combined_map <- ggplot() +
     data = cmf1,
     stat = "sf",
     position = "identity",
-    colour = "black",
-    #pattern = 'stripe',
+    colour = "#00000066",
+    size = 0.25,
     pattern_aspect_ratio = 1.8,
     pattern_fill = "black",
-    pattern_alpha = 0.4
+    pattern_alpha = 0.3
   ) +
-  scale_pattern_density_discrete(range = c(0.01, 0.3)) +
-  scale_pattern_spacing_discrete(range = c(0.01, 0.03)) +
-  scale_fill_fermenter(name = "Child Marriage Rate", palette = "YlOrBr", direction = 1) +
+  scale_pattern_density_discrete(range = c(0.005, 0.3), name = "Legality") +
+  scale_pattern_spacing_discrete(range = c(0.005, 0.03), name = "Legality") +
+  scale_pattern_angle_discrete(range = c(0, 45), name = "Legality") +
+  scale_pattern_discrete(name = "Legality") +
+  scale_fill_fermenter(name = "Rate", palette = "YlOrBr", direction = 1,
+    na.value = "grey",
+    labels = scales::label_number(suffix = "%")) +
   labs(
     title = "CHILD MARRIAGE",
-    subtitle = "Average child marriage rate (2005-2020) and legality",
+    subtitle = "% women aged 20-24 married before 18 (average 2005-2020)\nand the legal status of child marriage",
     caption = paste(
-      "**CHART::** Ambalika Gupta & James Goldie, 360info",
-      "**DATA::** World Bank",
+      "**CHART:** Ambalika Gupta & James Goldie, 360info",
+      "**DATA:** UNStats, World Bank via Our World in Data",
       sep = "<br>"
     )
-  ) 
+  ) +
+  theme_360() +
+  theme(
+    # legend.position = "top",
+    legend.position = c(0.1625, 0.35),
+    legend.direction = "vertical",
+    legend.key.width = unit(0.5, "cm"),
+    legend.title = element_text(size = rel(0.55)),
+    legend.text = element_text(size = rel(0.4)),
+    legend.box = "horizontal",
+    legend.box.background = element_rect(fill = "#ffffff99", colour = NA),
+    panel.grid = element_blank(),
+    plot.margin = margin()
+  )
   
-ggsave(
-  "chart_test.png" ,
-  plot = combined_map,
-  scale = 0.9,
-  width = 20,
-  height = 10,
-  units = "cm",
-  dpi = 320
-)
+save_360plot(combined_map, "combined_map.png", retina = 4,
+  shape = "sdtv-landscape")
 
 ```
 
