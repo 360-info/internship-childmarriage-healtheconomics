@@ -20,7 +20,7 @@ library(ggplot2)
 library(plotly)
 library(themes360info)
 library(rio)
-
+library(ggtext)
 ```
 
 ```{r read data}
@@ -63,31 +63,41 @@ comparison$organisation[comparison$organisation == "WHR"] <-
 comparison$organisation[comparison$organisation == "HDI"] <-
   "Human Development Index"
 
-filtered <- comparison %>% 
-  filter(country_name %in% c("Australia", "Afghanistan", "India", "Indonesia", "Malaysia", "Pakistan"))
-
+filtered <- comparison %>%
+  filter(country_name %in% c(
+    "Australia",
+    "Afghanistan",
+    "India",
+    "Indonesia",
+    "Malaysia",
+    "Pakistan"))
 ```
 
 ```{r}
 
-ggplot(data = filtered,
+country_comparison_plot <- ggplot(data = filtered,
        aes(x = year,
            y = score,
            color = organisation)) +
   geom_line(size = 1) +
   geom_point(size = 2) +
   scale_y_continuous(labels = scales::label_percent()) +
-  scale_color_manual(values=c("#d73027", "#4575b4")) +
+  scale_color_manual(values = c(
+    "Human Development Index" = "#d73027",
+    "Life Ladder Score" = "#4575b4")) +
   labs(
-    title = "Measuring Wellbeing",
-    subtitle = paste("The Human Development Index is a gold standard for measuring a country’s progress." ,
-                     "The Life Ladder score, measured by the annual World Happiness Report, asks survey respondents to rate their lives.", "It often tells a very different story.", 
-                     sep = "\n"),
+    title = toupper("Measuring Wellbeing"),
+    subtitle = paste(
+      "The UN's **<span style=\"color:#d73027\">Human Development Index</span>** is a leading indicator for measuring a country’s progress",
+      "and includes life expectancy and income per capita. But the **<span style=\"color:#4575b4\">Life Ladder Score</span>**, measured by the",
+      "annual World Happiness Report, asks survey respondents to rate their lives.",
+      "It often tells a very different story.",
+      sep = "<br>"),
     y = "Score",
     caption = paste(
       "**CHART:** Ambalika Gupta & James Goldie, 360info",
       "**DATA:** UNDP & World Happiness Report",
-      sep = "\n"
+      sep = "<br>"
     )
   ) +
   facet_wrap(~ country_name,
@@ -98,12 +108,20 @@ ggplot(data = filtered,
     legend.direction = "horizontal",
     axis.title.x = element_blank(),
     legend.title = element_blank(),
-    legend.key.width = unit(1, "cm") ,
-    panel.grid = element_blank(),
-    plot.title=element_text(face="bold"),
-    strip.text = element_text(face="bold"), 
-    plot.subtitle=element_text(size=12, color="black")
+    legend.key.width = unit(1, "cm"),
+    panel.background = element_rect(fill = "#fcfcfc", colour = NA),
+    panel.spacing.x = unit(1, "cm"),
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    strip.text = element_text(face = "bold"),
+    plot.margin = margin(0.5, 0.5, 1, 0.5, "cm"),
+    plot.subtitle = element_markdown(
+      family = "Body 360info", face = "plain", color = "black")
   )
+
+save_360plot(country_comparison_plot,
+  file.path("out", "six-countries-comparison.png"),
+  shape = "sdtv-portrait")
 
 ```
 
