@@ -20,54 +20,131 @@ library(ggplot2)
 library(plotly)
 library(themes360info)
 library(rio)
-
 ```
 
-```{r read data}
+```{r readdata}
 
 # Reading HDI data
 
 hdi <- read_csv("data/healtheconomics/hdi_timeseries.csv")
 
-hdi <- hdi %>% 
-  pivot_longer(
-    cols = 6:37,
-    names_to = "year",
-    values_to = "HDI"
-  )
-
-hdi <- hdi %>% 
-  select(c(-region, -hdicode, -hdi_rank_2021)) %>% 
-  mutate(year = str_remove_all(year, "hdi_")) %>% 
-  mutate(year = as.numeric(year)) %>% 
-  filter(year > 2014)
+hdi <- hdi %>%
+  select(-c(region, hdicode, hdi_rank_2021)) %>%
+  pivot_longer(starts_with("hdi_"), names_to = "year", values_to = "hdi") |>
+  mutate(year = str_remove_all(year, "hdi_")) %>%
+  mutate(year = as.numeric(year))
 
 # Reading WHR(World Happiness Record) data
 
 whr <- read_excel("data/healtheconomics/wellbeing-otherfactos.xls")
 
-whr <- whr %>% 
+whr <- whr %>%
   clean_names() %>% 
-  mutate(WHR = life_ladder/10)
+  mutate(WHR = life_ladder / 10)
 
 # Comparison data
-
-comparison <- whr %>% 
-  left_join(hdi, by = c("country_name" = "country", "year"))
-
-comparison <- merge(whr, hdi, by.x = c("country_name", "year"), by.y = c("country", "year")) %>% 
-  select(country_name, year, 13:15)
-
-comparison <- comparison %>% 
-  pivot_longer(cols = c(3,5),
-               names_to = "organisation",
-               values_to = "score")
-
-comparison$organisation[comparison$organisation == "WHR"] <- "Happiness Score"
-comparison$organisation[comparison$organisation == "HDI"] <- "Human Development Index"
+# james - i'm assuming you're pivoting the two scores longer here?
+comparison <- whr %>%
+  left_join(hdi, by = c("country_name" = "country", "year")) %>%
+  select(country_name, year, WHR, iso3, hdi) %>%
+  pivot_longer(
+    cols = c(WHR, hdi),
+    names_to = "organisation",
+    values_to = "score"
+  ) %>%
+  mutate(organisation = recode(organisation,
+    "WHR" = "Happiness Score",
+    "hdi" = "Human Development Index"
+  ))
 
 ```
 
+```{r bycountries}
+
+dir.create("out/by-country", recursive = TRUE, showWarnings = FALSE)
+
+plot_scores <- function(df) {
+  
+  country_name <- df$country_name[1]
+
+  country_plot <- ggplot(df) +
+    aes(x = year, y = score, color = organisation) +
+    geom_line(size = 1) +
+    geom_point(size = 2) +
+    scale_y_continuous(labels = scales::label_percent()) +
+    labs(
+      title = paste("WELLBEING ECONOMICS:", toupper(country_name)),
+      subtitle = "Comparing Human Development Index with World Happiness Score",
+      color = "Organisation",
+      x = "Year",
+      y = "Score",
+      caption = paste(
+        "**CHART:** Ambalika Gupta & James Goldie, 360info",
+        "**DATA:** UNDP & World Happiness Report",
+        "Note: scores have been scaled to percentages",
+        sep = "<br>"
+      )
+    ) +
+    theme_360() +
+    theme(
+      legend.position = "top",
+      legend.direction = "horizontal",
+      legend.key.width = unit(1, "cm")
+    )
+
+  save_360plot(
+    country_plot,
+    file.path("out", "by-country", paste0(country_name, ".png")),
+    shape = "square")
+  save_360plot(
+    country_plot,
+    file.path("out", "by-country", paste0(country_name, ".svg")),
+    shape = "square")
+}
+
+# plot each country
+comparison %>%
+  group_split(country_name, .keep = TRUE) %>%
+  walk(plot_scores)
+
+```
+
+```{r nz}
+
+# New Zealand
+
+nz <- comparison %>%
+  filter(country_name == "New Zealand")
+
+ggplot(
+  data = nz,
+  aes(
+    x = year,
+    y = score,
+    color = organisation
+  )
+) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  labs(
+    title = "WELLBEING ECONOMICS: NEW ZEALAND",
+    subtitle = "Comparing Human Development Index with World Happiness Score",
+    color = "Organisation",
+    x = "Year",
+    y = "Score",
+    caption = paste(
+      "**CHART:** Ambalika Gupta & James Goldie, 360info",
+      "**DATA:** UNDP & World Happiness Report",
+      sep = "\n"
+    )
+  ) +
+  theme_360() +
+  theme(
+    legend.position = "top",
+    legend.direction = "horizontal",
+    legend.key.width = unit(1, "cm")
+  )
+```
 
 ```{r india}
 
@@ -76,10 +153,14 @@ comparison$organisation[comparison$organisation == "HDI"] <- "Human Development 
 india <- comparison %>%
   filter(country_name == "India")
 
-ggplot(data = india,
-       aes(x = year,
-           y = score,
-           color = organisation)) +
+ggplot(
+  data = india,
+  aes(
+    x = year,
+    y = score,
+    color = organisation
+  )
+) +
   geom_line(size = 1) +
   geom_point(size = 2) +
   labs(
@@ -98,9 +179,8 @@ ggplot(data = india,
   theme(
     legend.position = "top",
     legend.direction = "horizontal",
-    legend.key.width = unit(1, "cm") 
+    legend.key.width = unit(1, "cm")
   )
-
 ```
 
 ```{r paki}
@@ -110,10 +190,14 @@ ggplot(data = india,
 pakistan <- comparison %>%
   filter(country_name == "Pakistan")
 
-ggplot(data = pakistan,
-       aes(x = year,
-           y = score,
-           color = organisation)) +
+ggplot(
+  data = pakistan,
+  aes(
+    x = year,
+    y = score,
+    color = organisation
+  )
+) +
   geom_line(size = 1) +
   geom_point(size = 2) +
   labs(
@@ -142,9 +226,8 @@ ggplot(data = pakistan,
   theme(
     legend.position = "top",
     legend.direction = "horizontal",
-    legend.key.width = unit(1, "cm") 
+    legend.key.width = unit(1, "cm")
   )
-
 ```
 
 ```{r indonesia}
@@ -154,10 +237,14 @@ ggplot(data = pakistan,
 indonesia <- comparison %>%
   filter(country_name == "Indonesia")
 
-ggplot(data = indonesia,
-       aes(x = year,
-           y = score,
-           color = organisation)) +
+ggplot(
+  data = indonesia,
+  aes(
+    x = year,
+    y = score,
+    color = organisation
+  )
+) +
   geom_line(size = 1) +
   geom_point(size = 2) +
   labs(
@@ -176,9 +263,8 @@ ggplot(data = indonesia,
   theme(
     legend.position = "top",
     legend.direction = "horizontal",
-    legend.key.width = unit(1, "cm") 
+    legend.key.width = unit(1, "cm")
   )
-
 ```
 
 ```{r thai}
@@ -188,10 +274,14 @@ ggplot(data = indonesia,
 thailand <- comparison %>%
   filter(country_name == "Thailand")
 
-ggplot(data = thailand,
-       aes(x = year,
-           y = score,
-           color = organisation)) +
+ggplot(
+  data = thailand,
+  aes(
+    x = year,
+    y = score,
+    color = organisation
+  )
+) +
   geom_line(size = 1) +
   geom_point(size = 2) +
   labs(
@@ -210,9 +300,8 @@ ggplot(data = thailand,
   theme(
     legend.position = "top",
     legend.direction = "horizontal",
-    legend.key.width = unit(1, "cm") 
+    legend.key.width = unit(1, "cm")
   )
-
 ```
 
 ```{r sgp}
@@ -222,10 +311,14 @@ ggplot(data = thailand,
 singapore <- comparison %>%
   filter(country_name == "Singapore")
 
-ggplot(data = singapore,
-       aes(x = year,
-           y = score,
-           color = organisation)) +
+ggplot(
+  data = singapore,
+  aes(
+    x = year,
+    y = score,
+    color = organisation
+  )
+) +
   geom_line(size = 1) +
   geom_point(size = 2) +
   labs(
@@ -244,9 +337,8 @@ ggplot(data = singapore,
   theme(
     legend.position = "top",
     legend.direction = "horizontal",
-    legend.key.width = unit(1, "cm") 
+    legend.key.width = unit(1, "cm")
   )
-
 ```
 
 ```{r myanmar}
@@ -256,10 +348,14 @@ ggplot(data = singapore,
 myanmar <- comparison %>%
   filter(country_name == "Myanmar")
 
-ggplot(data = myanmar,
-       aes(x = year,
-           y = score,
-           color = organisation)) +
+ggplot(
+  data = myanmar,
+  aes(
+    x = year,
+    y = score,
+    color = organisation
+  )
+) +
   geom_line(size = 1) +
   geom_point(size = 2) +
   labs(
@@ -278,7 +374,7 @@ ggplot(data = myanmar,
   theme(
     legend.position = "top",
     legend.direction = "horizontal",
-    legend.key.width = unit(1, "cm") 
+    legend.key.width = unit(1, "cm")
   )
 ```
 
@@ -289,10 +385,14 @@ ggplot(data = myanmar,
 aus <- comparison %>%
   filter(country_name == "Australia")
 
-ggplot(data = aus,
-       aes(x = year,
-           y = score,
-           color = organisation)) +
+ggplot(
+  data = aus,
+  aes(
+    x = year,
+    y = score,
+    color = organisation
+  )
+) +
   geom_line(size = 1) +
   geom_point(size = 2) +
   labs(
@@ -312,8 +412,7 @@ ggplot(data = aus,
     legend.position = "top",
     legend.direction = "horizontal",
     legend.key.width = unit(1, "cm")
-    ) 
-
+  )
 ```
 
 
