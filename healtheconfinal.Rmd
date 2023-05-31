@@ -76,6 +76,7 @@ ggplot(data = filtered,
            color = organisation)) +
   geom_line(size = 1) +
   geom_point(size = 2) +
+  scale_y_continuous(labels = scales::label_percent()) +
   scale_color_manual(values=c("#d73027", "#4575b4")) +
   labs(
     title = "Measuring Wellbeing",
@@ -100,6 +101,7 @@ ggplot(data = filtered,
     legend.key.width = unit(1, "cm") ,
     panel.grid = element_blank(),
     plot.title=element_text(face="bold"),
+    strip.text = element_text(face="bold"), 
     plot.subtitle=element_text(size=12, color="black")
   )
 
