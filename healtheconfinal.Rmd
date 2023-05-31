@@ -67,6 +67,54 @@ comparison <- whr %>%
 
 ```
 
+```{r bycountries}
+
+dir.create("out/by-country", recursive = TRUE, showWarnings = FALSE)
+
+plot_scores <- function(df) {
+  
+  country_name <- df$country_name[1]
+
+  country_plot <- ggplot(df) +
+    aes(x = year, y = score, color = organisation) +
+    geom_line(size = 1) +
+    geom_point(size = 2) +
+    labs(
+      title = paste("WELLBEING ECONOMICS:", toupper(country_name)),
+      subtitle = "Comparing Human Development Index with World Happiness Score",
+      color = "Organisation",
+      x = "Year",
+      y = "Score",
+      caption = paste(
+        "**CHART:** Ambalika Gupta & James Goldie, 360info",
+        "**DATA:** UNDP & World Happiness Report",
+        sep = "<br>"
+      )
+    ) +
+    theme_360() +
+    theme(
+      legend.position = "top",
+      legend.direction = "horizontal",
+      legend.key.width = unit(1, "cm")
+    )
+
+  save_360plot(
+    country_plot,
+    file.path("out", "by-country", paste0(country_name, ".png")),
+    shape = "sdtv-landscape")
+  save_360plot(
+    country_plot,
+    file.path("out", "by-country", paste0(country_name, ".svg")),
+    shape = "sdtv-landscape")
+}
+
+# plot each country
+comparison %>%
+  group_split(country_name, .keep = TRUE) %>%
+  walk(plot_scores)
+
+```
+
 ```{r nz}
 
 # New Zealand
