@@ -47,26 +47,24 @@ hdi <- hdi %>%
 whr <- read_excel("data/healtheconomics/wellbeing-otherfactos.xls")
 
 whr <- whr %>%
-  clean_names() %>%
+  clean_names() %>% 
   mutate(WHR = life_ladder / 10)
 
 # Comparison data
-
+# james - i'm assuming you're pivoting the two scores longer here?
 comparison <- whr %>%
-  left_join(hdi, by = c("country_name" = "country", "year"))
-
-comparison <- merge(whr, hdi, by.x = c("country_name", "year"), by.y = c("country", "year")) %>%
-  select(country_name, year, 13:15)
-
-comparison <- comparison %>%
+  left_join(hdi, by = c("country_name" = "country", "year")) %>%
+  select(country_name, year, WHR, iso3, hdi) %>%
   pivot_longer(
-    cols = c(3, 5),
+    cols = c(WHR, hdi),
     names_to = "organisation",
     values_to = "score"
-  )
+  ) %>%
+  mutate(organisation = recode(organisation,
+    "WHR" = "Happiness Score",
+    "HDI" = "Human Development Index"
+  ))
 
-comparison$organisation[comparison$organisation == "WHR"] <- "Happiness Score"
-comparison$organisation[comparison$organisation == "HDI"] <- "Human Development Index"
 ```
 
 ```{r nz}
