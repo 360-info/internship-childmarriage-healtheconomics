@@ -1,7 +1,7 @@
 ---
-title: "healthecon"
+title: "WellBeing Economics"
 author: "Ambalika"
-date: sys.date
+date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: html_document
 ---
 
@@ -29,42 +29,79 @@ library(rio)
 
 hdi <- read_csv("data/healtheconomics/hdi_timeseries.csv")
 
-hdi <- hdi %>% 
-  pivot_longer(
-    cols = 6:37,
-    names_to = "year",
-    values_to = "HDI"
-  )
+hdi <- hdi %>%
+  pivot_longer(cols = 6:37,
+               names_to = "year",
+               values_to = "HDI")
 
-hdi <- hdi %>% 
-  select(c(-region, -hdicode, -hdi_rank_2021)) %>% 
-  mutate(year = str_remove_all(year, "hdi_")) %>% 
-  mutate(year = as.numeric(year)) %>% 
-  filter(year > 2014)
+hdi <- hdi %>%
+  select(c(-region,-hdicode,-hdi_rank_2021)) %>%
+  mutate(year = str_remove_all(year, "hdi_")) %>%
+  mutate(year = as.numeric(year))
 
 # Reading WHR(World Happiness Record) data
 
 whr <- read_excel("data/healtheconomics/wellbeing-otherfactos.xls")
 
-whr <- whr %>% 
-  clean_names() %>% 
-  mutate(WHR = life_ladder/10)
+whr <- whr %>%
+  clean_names() %>%
+  mutate(WHR = life_ladder / 10)
 
 # Comparison data
 
-comparison <- whr %>% 
-  left_join(hdi, by = c("country_name" = "country", "year"))
-
-comparison <- merge(whr, hdi, by.x = c("country_name", "year"), by.y = c("country", "year")) %>% 
+comparison <- whr %>%
+  left_join(hdi, by = c("country_name" = "country", "year")) %>%
   select(country_name, year, 13:15)
 
-comparison <- comparison %>% 
-  pivot_longer(cols = c(3,5),
+comparison <- comparison %>%
+  pivot_longer(cols = c(3, 5),
                names_to = "organisation",
                values_to = "score")
 
-comparison$organisation[comparison$organisation == "WHR"] <- "Happiness Score"
-comparison$organisation[comparison$organisation == "HDI"] <- "Human Development Index"
+comparison$organisation[comparison$organisation == "WHR"] <-
+  "Life Ladder Score"
+comparison$organisation[comparison$organisation == "HDI"] <-
+  "Human Development Index"
+
+filtered <- comparison %>% 
+  filter(country_name %in% c("Australia", "Afghanistan", "India", "Indonesia", "Malaysia", "Pakistan"))
+
+```
+
+```{r}
+
+ggplot(data = filtered,
+       aes(x = year,
+           y = score,
+           color = organisation)) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  scale_color_manual(values=c("#d73027", "#4575b4")) +
+  labs(
+    title = "Measuring Wellbeing",
+    subtitle = paste("The Human Development Index is a gold standard for measuring a country’s progress." ,
+                     "The Life Ladder score, measured by the annual World Happiness Report, asks survey respondents to rate their lives.", "It often tells a very different story.", 
+                     sep = "\n"),
+    y = "Score",
+    caption = paste(
+      "**CHART:** Ambalika Gupta & James Goldie, 360info",
+      "**DATA:** UNDP & World Happiness Report",
+      sep = "\n"
+    )
+  ) +
+  facet_wrap(~ country_name,
+               ncol = 2) +
+  theme_360() +
+  theme(
+    legend.position = "top",
+    legend.direction = "horizontal",
+    axis.title.x = element_blank(),
+    legend.title = element_blank(),
+    legend.key.width = unit(1, "cm") ,
+    panel.grid = element_blank(),
+    plot.title=element_text(face="bold"),
+    plot.subtitle=element_text(size=12, color="black")
+  )
 
 ```
 
@@ -82,6 +119,7 @@ ggplot(data = india,
            color = organisation)) +
   geom_line(size = 1) +
   geom_point(size = 2) +
+  scale_color_manual(values=c("#377EB7", "#EF3E30")) +
   labs(
     title = "Wellbeing Economics: India",
     subtitle = "Comparing Human Development Index with World Happiness Score",
