@@ -36,7 +36,8 @@ hdi <- hdi %>%
   )
 
 hdi <- hdi %>%
-  select(c(-region, -hdicode, -hdi_rank_2021)) %>%
+  select(-c(region, hdicode, hdi_rank_2021)) %>%
+  pivot_longer(starts_with("hdi_"), names_to = "year", values_to = "hdi") |>
   mutate(year = str_remove_all(year, "hdi_")) %>%
   mutate(year = as.numeric(year)) %>%
   filter(year > 2014)
