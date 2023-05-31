@@ -29,18 +29,10 @@ library(rio)
 hdi <- read_csv("data/healtheconomics/hdi_timeseries.csv")
 
 hdi <- hdi %>%
-  pivot_longer(
-    cols = 6:37,
-    names_to = "year",
-    values_to = "HDI"
-  )
-
-hdi <- hdi %>%
   select(-c(region, hdicode, hdi_rank_2021)) %>%
   pivot_longer(starts_with("hdi_"), names_to = "year", values_to = "hdi") |>
   mutate(year = str_remove_all(year, "hdi_")) %>%
-  mutate(year = as.numeric(year)) %>%
-  filter(year > 2014)
+  mutate(year = as.numeric(year))
 
 # Reading WHR(World Happiness Record) data
 
@@ -62,7 +54,7 @@ comparison <- whr %>%
   ) %>%
   mutate(organisation = recode(organisation,
     "WHR" = "Happiness Score",
-    "HDI" = "Human Development Index"
+    "hdi" = "Human Development Index"
   ))
 
 ```
@@ -79,6 +71,7 @@ plot_scores <- function(df) {
     aes(x = year, y = score, color = organisation) +
     geom_line(size = 1) +
     geom_point(size = 2) +
+    scale_y_continuous(labels = scales::label_percent()) +
     labs(
       title = paste("WELLBEING ECONOMICS:", toupper(country_name)),
       subtitle = "Comparing Human Development Index with World Happiness Score",
@@ -88,6 +81,7 @@ plot_scores <- function(df) {
       caption = paste(
         "**CHART:** Ambalika Gupta & James Goldie, 360info",
         "**DATA:** UNDP & World Happiness Report",
+        "Note: scores have been scaled to percentages",
         sep = "<br>"
       )
     ) +
@@ -101,11 +95,11 @@ plot_scores <- function(df) {
   save_360plot(
     country_plot,
     file.path("out", "by-country", paste0(country_name, ".png")),
-    shape = "sdtv-landscape")
+    shape = "square")
   save_360plot(
     country_plot,
     file.path("out", "by-country", paste0(country_name, ".svg")),
-    shape = "sdtv-landscape")
+    shape = "square")
 }
 
 # plot each country
