@@ -6,7 +6,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE)
 ```
 
 ```{r package}
@@ -62,9 +62,48 @@ comparison <- comparison %>%
                names_to = "organisation",
                values_to = "score")
 
+comparison$organisation[comparison$organisation == "WHR"] <- "Happiness Score"
+comparison$organisation[comparison$organisation == "HDI"] <- "Human Development Index"
+
 ```
 
 ```{r countrywise}
+
+# New Zealand
+
+nz <- comparison %>%
+  filter(country_name == "New Zealand")
+
+ggplot(data = nz,
+       aes(x = year,
+           y = score,
+           color = organisation)) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  labs(
+    title = "WELLBEING ECONOMICS: NEW ZEALAND",
+    subtitle = "Comparing Human Development Index with World Happiness Score",
+    color = "Organisation",
+    x = "Year",
+    y = "Score",
+    caption = paste(
+      "**CHART:** Ambalika Gupta & James Goldie, 360info",
+      "**DATA:** UNDP & World Happiness Report",
+      sep = "\n"
+    )
+  ) +
+  theme_360() +
+  theme(
+    legend.position = "top",
+    legend.direction = "horizontal",
+    legend.key.width = unit(1, "cm")
+  )
+
+```
+
+```{r}
+
+# India
 
 india <- comparison %>%
   filter(country_name == "India")
@@ -73,22 +112,235 @@ ggplot(data = india,
        aes(x = year,
            y = score,
            color = organisation)) +
-  geom_line() +
-  geom_point() +
-  theme(legend.position = "top") +
-  theme_360() 
-
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  labs(
+    title = "WELLBEING ECONOMICS: INDIA",
+    subtitle = "Comparing Human Development Index with World Happiness Score",
+    color = "Organisation",
+    x = "Year",
+    y = "Score",
+    caption = paste(
+      "**CHART:** Ambalika Gupta & James Goldie, 360info",
+      "**DATA:** UNDP & World Happiness Report",
+      sep = "\n"
+    )
+  ) +
+  theme_360() +
+  theme(
+    legend.position = "top",
+    legend.direction = "horizontal",
+    legend.key.width = unit(1, "cm") 
+  )
 
 ```
 
+```{r}
 
+# Pakistan
 
+pakistan <- comparison %>%
+  filter(country_name == "Pakistan")
 
+ggplot(data = pakistan,
+       aes(x = year,
+           y = score,
+           color = organisation)) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  labs(
+    title = "WELLBEING ECONOMICS: PAKISTAN",
+    subtitle = "Comparing Human Development Index with World Happiness Score",
+    color = "Organisation",
+    x = "Year",
+    y = "Score",
+    caption = paste(
+      "**CHART:** Ambalika Gupta & James Goldie, 360info",
+      "**DATA:** UNDP & World Happiness Report",
+      sep = "\n"
+    )
+  ) +
+  theme_360() +
+  theme(
+    legend.position = "top",
+    legend.direction = "horizontal",
+    legend.key.width = unit(1, "cm") 
+  )
 
+```
 
+```{r}
 
+# Indonesia
 
+indonesia <- comparison %>%
+  filter(country_name == "Indonesia")
 
+ggplot(data = indonesia,
+       aes(x = year,
+           y = score,
+           color = organisation)) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  labs(
+    title = "WELLBEING ECONOMICS: INDONESIA",
+    subtitle = "Comparing Human Development Index with World Happiness Score",
+    color = "Organisation",
+    x = "Year",
+    y = "Score",
+    caption = paste(
+      "**CHART:** Ambalika Gupta & James Goldie, 360info",
+      "**DATA:** UNDP & World Happiness Report",
+      sep = "\n"
+    )
+  ) +
+  theme_360() +
+  theme(
+    legend.position = "top",
+    legend.direction = "horizontal",
+    legend.key.width = unit(1, "cm") 
+  )
+
+```
+
+```{r}
+
+# Thailand
+
+thailand <- comparison %>%
+  filter(country_name == "Thailand")
+
+ggplot(data = thailand,
+       aes(x = year,
+           y = score,
+           color = organisation)) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  labs(
+    title = "WELLBEING ECONOMICS: THAILAND",
+    subtitle = "Comparing Human Development Index with World Happiness Score",
+    color = "Organisation",
+    x = "Year",
+    y = "Score",
+    caption = paste(
+      "**CHART:** Ambalika Gupta & James Goldie, 360info",
+      "**DATA:** UNDP & World Happiness Report",
+      sep = "\n"
+    )
+  ) +
+  theme_360() +
+  theme(
+    legend.position = "top",
+    legend.direction = "horizontal",
+    legend.key.width = unit(1, "cm") 
+  )
+
+```
+
+```{r}
+
+# Singapore
+
+singapore <- comparison %>%
+  filter(country_name == "Singapore")
+
+ggplot(data = singapore,
+       aes(x = year,
+           y = score,
+           color = organisation)) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  labs(
+    title = "WELLBEING ECONOMICS: SINGAPORE",
+    subtitle = "Comparing Human Development Index with World Happiness Score",
+    color = "Organisation",
+    x = "Year",
+    y = "Score",
+    caption = paste(
+      "**CHART:** Ambalika Gupta & James Goldie, 360info",
+      "**DATA:** UNDP & World Happiness Report",
+      sep = "\n"
+    )
+  ) +
+  theme_360() +
+  theme(
+    legend.position = "top",
+    legend.direction = "horizontal",
+    legend.key.width = unit(1, "cm") 
+  )
+
+```
+
+```{r}
+
+# Myanmar
+
+myanmar <- comparison %>%
+  filter(country_name == "Myanmar")
+
+ggplot(data = myanmar,
+       aes(x = year,
+           y = score,
+           color = organisation)) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  labs(
+    title = "WELLBEING ECONOMICS: MYANMAR",
+    subtitle = "Comparing Human Development Index with World Happiness Score",
+    color = "Organisation",
+    x = "Year",
+    y = "Score",
+    caption = paste(
+      "**CHART:** Ambalika Gupta & James Goldie, 360info",
+      "**DATA:** UNDP & World Happiness Report",
+      sep = "\n"
+    )
+  ) +
+  theme_360() +
+  theme(
+    legend.position = "top",
+    legend.direction = "horizontal",
+    legend.key.width = unit(1, "cm") 
+  )
+```
+
+```{r}
+
+# Australia
+
+aus <- comparison %>%
+  filter(country_name == "Australia")
+
+ggplot(data = aus,
+       aes(x = year,
+           y = score,
+           color = organisation)) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  labs(
+    title = "WELLBEING ECONOMICS: AUSTRALIA",
+    subtitle = "Comparing Human Development Index with World Happiness Score",
+    color = "Organisation",
+    x = "Year",
+    y = "Score",
+    caption = paste(
+      "**CHART:** Ambalika Gupta & James Goldie, 360info",
+      "**DATA:** UNDP & World Happiness Report",
+      sep = "\n"
+    )
+  ) +
+  theme_360() +
+  theme(
+    legend.position = "top",
+    legend.direction = "horizontal",
+    legend.key.width = unit(1, "cm")
+    ) 
+
+```
+
+```{r}
+
+```
 
 
 
