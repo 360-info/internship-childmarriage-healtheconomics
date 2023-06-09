@@ -1,35 +1,18 @@
-# quarto-scaffold
+ ✅ Publication checklist
 
-Base a new repo off this public template to get started with a reproducible analysis or graphic quickly. The template comes with a [dev container](https://code.visualstudio.com/docs/remote/containers) in order to get working with 360's data science stack quickly.
+# Data Analysis Revolutinizing Journalism
 
-## 🛠 Get started
+Report is a brief summary of the analysis we have conducted at 360info organisation. It contains draft and final analysis for the two topics assigned during our internship. It also includes exploratory data analysis for knowledge purposes. 
 
-To start working with a preconfigured, reproducible environment:
+Topic 1: Our initial task was researching datasets related to child marriage, particularly during Covid-19. Followed by data wrangling for tidying data and combining datasets for the final visualization. The above visualisations were the initial drafts for the editor’s reference and have played a crucial role in arriving at the final visualisation.
+In order to understand the contrast between the child marriage rate across the globe and the legal policy existing in each country, we wanted to create one visualisation which could display both. 
 
-- Clone this repository
-- Open it in [VSCode](https://code.visualstudio.com)
-- Open the command palette (Cmd/Ctrl+Shift+P) and run **"Remote-Containers: Reopen in Container"**
-- The project will now be open in a container that includes Quarto, R and the packages needed to reproduce the analysis
+Topic 2: The aim was to observe the trend of HDI and Happiness Score(Life Ladder Score) over the past years. While HDI is more quantitative and defined and Happiness Score is more subjective based on well-being, the difference in trends of both the scores speaks volumes. Unlike the first topic, the idea behind this visualisation was conceived from the start once the datasets had been shortlisted. The countries in this visualisation were shortlisted based on the unique trend observed amongst all the countries.
 
-## ➕ Adding stories
+Repo name: https://github.com/360-info/internship-childmarriage-healtheconomics.git
 
-This repo just keeps the dev environment scaffolding; templates for individual analyses and graphics are kept in the [`quarto-examples`] repo. To bring one of them into your project with [Quarto](https://quarto.org), run (for example):
+## Use + Remix rights
 
-```shell
-quarto use extension 360-info/quarto-examples/360analysis
-```
+![[Creative Commons Attribution 4.0](https://creativecommons.org/licenses/by/4.0)](https://mirrors.creativecommons.org/presskit/buttons/80x15/png/by.png)
 
-## ✅ Publication checklist
-
-- [ ] Replace this README with [`README-template.md`](README-template.md), adding:
-  * `[report_title]`
-  * `[report_summary]`
-  * `[report_datasources_links]`
-  * `[report_codespaces_id]`
-    - (lookup the repo ID in the address bar once you select it [in the Codespaces launcher](https://github.com/codespaces/new))
-  * Any exceptions to [CC BY 4.0](https://creativecommons.org/licenses/by/4.0) licensing
-  * `[report_reponame]`
-  * Any changes that need to be made to reproduction instructions
-- [ ] Fill in [`data/README.md`](data/README.md) with the data dictionary, links or other notes needed to understand and re-use the dataset
-- [ ] Change the 
-- [ ] Make sure any additional R packages used in the analysis are installed at the bottom of [`.devcontainer/Dockerfile`](.devcontainer/Dockerfile)
+These charts, as well as the analyses that underpin them, are available under a Creative Commons Attribution 4.0 licence. This includes commercial reuse and derivates.
