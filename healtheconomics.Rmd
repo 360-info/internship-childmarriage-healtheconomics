@@ -20,6 +20,7 @@ library(ggplot2)
 library(plotly)
 library(themes360info)
 library(rio)
+library(ggtext)
 
 ```
 
@@ -438,8 +439,6 @@ ggplotly(
 )
 
 ```
-
-
 
 
 

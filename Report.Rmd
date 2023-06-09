@@ -43,6 +43,8 @@ library(scales)
 
 ```
 
+# Git Repo Link: https://github.com/360-info/internship-childmarriage-healtheconomics.git
+
 # Background of Organisation and Scope of Work within Internship : 
 
 360info is an open-access global information agency that addresses the world's biggest challenges and offers practical and research-based solutions. It is a digital wire which publishes and broadcasts its content under the  Creative Commons 4.0 license which is very flexible in terms of publishing academic content. 
@@ -224,11 +226,6 @@ cmf <- law_2 %>%
 
 countries <- ne_countries(returnclass = "sf", scale = "medium")
 
-cmf1 <- countries %>% 
-  select(iso_a3) %>% 
-  left_join(cmf, by = c("iso_a3" = "Code")) %>% 
-  drop_na(Law)
-
 cmf %>%
   mutate(
     LawStr = case_when(
@@ -239,6 +236,11 @@ cmf %>%
       Law == 0.75 ~ "Allowed",
       Law == 1    ~ "Allowed for girls only")) ->
   cmf
+
+cmf1 <- countries %>% 
+  select(iso_a3) %>% 
+  left_join(cmf, by = c("iso_a3" = "Code")) %>% 
+  drop_na(Law)
 
 
 ```
@@ -336,10 +338,59 @@ ggplot(data = child_covid, aes(
 
 ## Final Visualisation: % women aged 20-24 married before 18 (average 2005-2020) and the legal policy regarding child marriage
 
-```{r echo = FALSE, fig.align="center", warning=FALSE, message=FALSE, echo=FALSE, out.height="450px", out.width="680px"}
-knitr::include_graphics("combined_map.png")
-```
 
+```{r}
+
+ggplot() +
+  geom_sf(data = countries, fill = "grey", colour = "#00000066", size = 0.25) +
+  geom_sf_pattern(
+    mapping = aes(
+      pattern_spacing = LawStr,
+      pattern_density = LawStr,
+      pattern_angle   = LawStr,
+      pattern         = LawStr,
+      fill = latest_value
+    ),
+    data = cmf1,
+    stat = "sf",
+    position = "identity",
+    colour = "#00000066",
+    size = 0.25,
+    pattern_aspect_ratio = 1.8,
+    pattern_fill = "black",
+    pattern_alpha = 0.3
+  ) +
+  scale_pattern_density_discrete(range = c(0.005, 0.3), name = "Legality") +
+  scale_pattern_spacing_discrete(range = c(0.005, 0.03), name = "Legality") +
+  scale_pattern_angle_discrete(range = c(0, 45), name = "Legality") +
+  scale_pattern_discrete(name = "Legality") +
+  scale_fill_fermenter(name = "Rate", palette = "YlOrBr", direction = 1,
+    na.value = "grey",
+    labels = scales::label_number(suffix = "%")) +
+  labs(
+    title = "CHILD MARRIAGE",
+    subtitle = "% women aged 20-24 married before 18 (average 2005-2020)\nand the legal status of child marriage",
+    caption = paste(
+      "**CHART:** Ambalika Gupta & James Goldie, 360info",
+      "**DATA:** UNStats, World Bank via Our World in Data",
+      sep = "<br>"
+    )
+  ) +
+  theme_360() +
+  theme(
+    # legend.position = "top",
+    legend.position = c(0.1625, 0.35),
+    legend.direction = "vertical",
+    legend.key.width = unit(0.5, "cm"),
+    legend.title = element_text(size = rel(0.55)),
+    legend.text = element_text(size = rel(0.4)),
+    legend.box = "horizontal",
+    legend.box.background = element_rect(fill = "#ffffff99", colour = NA),
+    panel.grid = element_blank(),
+    plot.margin = margin()
+  )
+
+```
 
 ### Methodology
 
@@ -537,11 +588,69 @@ ggplot(data = gdp1, aes(fill = factor, x = country, y = value)) +
 ### Aim 
 To compare two frameworks of measuring well-being, the Human Development Index and the World Happiness Score. Are the stats shown by our policymakers actually reflecting the true well-being and welfare of the people?
 
-```{r echo = FALSE, fig.align="center", warning=FALSE, message=FALSE, echo=FALSE}
+```{r eval=FALSE, include=FALSE}
 
-knitr::include_graphics("wellbeing.png")
+filtered <- comparison %>%
+  filter(country_name %in% c(
+    "Australia",
+    "Afghanistan",
+    "India",
+    "Indonesia",
+    "Malaysia",
+    "Pakistan"))
+
+ggplot(data = filtered,
+       aes(x = year,
+           y = score,
+           color = organisation)) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  scale_y_continuous(labels = scales::label_percent()) +
+  scale_color_manual(values = c(
+    "Human Development Index" = "#d73027",
+    "Life Ladder Score" = "#4575b4")) +
+  labs(
+    title = toupper("Measuring Wellbeing"),
+    subtitle = paste(
+      "The UN's **<span style=\"color:#d73027\">Human Development Index</span>** is a leading indicator for measuring a country’s progress",
+      "and includes life expectancy and income per capita. But the **<span style=\"color:#4575b4\">Life Ladder Score</span>**, measured by the",
+      "annual World Happiness Report, asks survey respondents to rate their lives.",
+      "It often tells a very different story.",
+      sep = "<br>"),
+    y = "Score",
+    caption = paste(
+      "**CHART:** Ambalika Gupta & James Goldie, 360info",
+      "**DATA:** UNDP & World Happiness Report",
+      sep = "<br>"
+    )
+  ) +
+  facet_wrap(~ country_name,
+               ncol = 2) +
+  theme_360() +
+  theme(
+    legend.position = "top",
+    legend.direction = "horizontal",
+    axis.title.x = element_blank(),
+    legend.title = element_blank(),
+    legend.key.width = unit(1, "cm"),
+    panel.background = element_rect(fill = "#fcfcfc", colour = NA),
+    panel.spacing.x = unit(1, "cm"),
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    strip.text = element_text(face = "bold"),
+    plot.margin = margin(0.5, 0.5, 1, 0.5, "cm"),
+    plot.subtitle = element_markdown(
+      family = "Body 360info", face = "plain", color = "black")
+  )
 
 ```
+
+```{r echo = FALSE, fig.align="center", warning=FALSE, message=FALSE, echo=FALSE}
+
+knitr::include_graphics("out/six-countries-comparison.png")
+
+```
+
 
 ### Methodology
 The aim was to observe the trend of HDI and Happiness Score(Life Ladder Score) over the past years. While HDI is more quantitative and defined and Happiness Score is more subjective based on well-being, the difference in trends of both the scores speaks volumes. Unlike the first topic, the idea behind this visualisation was conceived from the start once the datasets had been shortlisted. The countries in this visualisation were shortlisted based on the unique trend observed amongst all the countries. The above visualisation has been published on the 360info website: https://360info.org/comparing-wellbeing-measurements/

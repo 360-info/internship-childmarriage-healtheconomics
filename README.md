@@ -11,6 +11,10 @@ Topic 2: The aim was to observe the trend of HDI and Happiness Score(Life Ladder
 
 Repo name: https://github.com/360-info/internship-childmarriage-healtheconomics.git
 
+Please refer to 
+- child_marriage_test.Rmd & healtheconomics.Rmd for first drafts of each topic
+- child_marriage_final.Rmd & healtheconfinal.Rmd for finalised visualisations of each topic
+
 ## Use + Remix rights
 
 ![[Creative Commons Attribution 4.0](https://creativecommons.org/licenses/by/4.0)](https://mirrors.creativecommons.org/presskit/buttons/80x15/png/by.png)

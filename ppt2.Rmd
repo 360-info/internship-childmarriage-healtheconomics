@@ -58,6 +58,9 @@ library(ggpattern)
 library(colorspace)
 library(scales)
 library(themes360info)
+library(rio)
+library(readxl)
+library(ggtext)
 
 ```
 
@@ -77,6 +80,95 @@ Contribute to a Special Report made up of 5-10 articles looking at different asp
 -   Graphics
 
 ---
+
+```{r data, include=FALSE}
+
+w_18 <- read_csv("data/child_marriage/w_18.csv")
+
+w_18 <- w_18 %>% 
+  select(geoAreaCode, geoAreaName, parentCode, parentName, ISO3, latest_value)
+
+law_2 <- read_csv("data/child_marriage/law_2.csv")
+
+cmf <- law_2 %>% 
+  left_join(w_18, by = c("Code" = "ISO3"))
+
+countries <- ne_countries(returnclass = "sf", scale = "medium")
+
+cmf1 <- countries %>% 
+  select(iso_a3) %>% 
+  left_join(cmf, by = c("iso_a3" = "Code")) %>% 
+  drop_na(Law)
+
+cmf1 %>%
+  mutate(
+    LawStr = case_when(
+      Law == 0    ~ "Prohibited",
+      Law == 0.25 ~
+        "Prohibited, but encouraged\nby some customary or\ntraditional laws",
+      Law == 0.5  ~ "Prohibited, but with legal\nexceptions around consent or\nsome groups of women",
+      Law == 0.75 ~ "Allowed",
+      Law == 1    ~ "Allowed for girls only")) ->
+  cmf1
+
+
+```
+
+```{r include=FALSE}
+
+combined_map <- ggplot() +
+  geom_sf(data = countries, fill = "grey", colour = "#00000066", size = 0.25) +
+  geom_sf_pattern(
+    mapping = aes(
+      pattern_spacing = LawStr,
+      pattern_density = LawStr,
+      pattern_angle   = LawStr,
+      pattern         = LawStr,
+      fill = latest_value
+    ),
+    data = cmf1,
+    stat = "sf",
+    position = "identity",
+    colour = "#00000066",
+    size = 0.25,
+    pattern_aspect_ratio = 1.8,
+    pattern_fill = "black",
+    pattern_alpha = 0.3
+  ) +
+  scale_pattern_density_discrete(range = c(0.005, 0.3), name = "Legality") +
+  scale_pattern_spacing_discrete(range = c(0.005, 0.03), name = "Legality") +
+  scale_pattern_angle_discrete(range = c(0, 45), name = "Legality") +
+  scale_pattern_discrete(name = "Legality") +
+  scale_fill_fermenter(name = "Rate", palette = "YlOrBr", direction = 1,
+    na.value = "grey",
+    labels = scales::label_number(suffix = "%")) +
+  labs(
+    title = "CHILD MARRIAGE",
+    subtitle = "% women aged 20-24 married before 18 (average 2005-2020)\nand the legal status of child marriage",
+    caption = paste(
+      "**CHART:** Ambalika Gupta & James Goldie, 360info",
+      "**DATA:** UNStats, World Bank via Our World in Data",
+      sep = "<br>"
+    )
+  ) +
+  theme_360() +
+  theme(
+    # legend.position = "top",
+    legend.position = c(0.1625, 0.35),
+    legend.direction = "vertical",
+    legend.key.width = unit(0.5, "cm"),
+    legend.title = element_text(size = rel(0.55)),
+    legend.text = element_text(size = rel(0.4)),
+    legend.box = "horizontal",
+    legend.box.background = element_rect(fill = "#ffffff99", colour = NA),
+    panel.grid = element_blank(),
+    plot.margin = margin()
+  )
+  
+save_360plot(combined_map, "combined_map.png", retina = 4,
+  shape = "sdtv-landscape")
+
+```
 
 ### Topic 1: Child Marriage during Covid-19
 Due to Covid-19 about **9 million** more girls were at risk of child marriage.
@@ -143,6 +235,164 @@ ggplot(data = child_covid, aes(
 + Possible reasons: School closures, Economic Distress, Service Disruptions, Parental Deaths, Lack of access to basic ammenities.
 *Source: UNICEF Press Release*
 
+
+```{r include=FALSE}
+
+whrfactor <- import_list("data/healtheconomics/2015_a.xlsx" , rbind=TRUE)
+
+whrfactor <- whrfactor %>% 
+  select(-`_file`)
+
+whrfactor <- whrfactor %>% 
+  pivot_longer(
+    cols = 2:9,
+    names_to = "factor",
+    values_to = "value"
+  )
+
+whrfactor <- whrfactor %>% 
+  mutate(factor = recode(factor,
+    "GDP_per_capita" = "GDP Per Capita",
+    "social_support" = "Social Support",
+    "life_expectancy" = "Life Expectancy",
+    "freedom" = "Freedom",
+    "generosity" = "Generosity",
+    "corruption_view" = "Corruption"
+  ))
+
+whrfac <- whrfactor %>%
+  filter(factor != c("residual", "score"))
+
+indonesiawhr <- whrfac %>%
+  filter(country == "Australia")
+
+indonesiascore <- whrfactor %>%
+  filter(factor == "score", country == "Australia")
+
+wellbeing <-
+  ggplot(data = indonesiawhr, aes(fill = factor, x = year, y = value)) +
+  scale_x_continuous(n.breaks = 8) +
+  scale_fill_manual(
+    values = c("#7fc97f",
+               "#beaed4",
+               "#fdc086",
+               "#ffff99",
+               "#386cb0",
+               "#000000",
+               "#f0027f"
+    ),
+    name = "Happiness Factors"
+  ) +
+  geom_bar(position = "stack", stat = "identity") +
+  labs(title = "World Happiness Score : Factor composition", y = "Index/Score") +
+  theme_360() +
+  theme(legend.position = "bottom",
+        axis.title.x = element_blank()) +
+  geom_line(data = indonesiascore, aes(x = year, y = value)) +
+  geom_point(data = indonesiascore)
+
+save_360plot(wellbeing, "happiness.png", shape = "sdtv-landscape")
+```
+
+```{r include=FALSE}
+
+# Reading HDI data
+
+hdi <- read_csv("data/healtheconomics/hdi_timeseries.csv")
+
+hdi <- hdi %>%
+  pivot_longer(cols = 6:37,
+               names_to = "year",
+               values_to = "HDI")
+
+hdi <- hdi %>%
+  select(c(-region,-hdicode,-hdi_rank_2021)) %>%
+  mutate(year = str_remove_all(year, "hdi_")) %>%
+  mutate(year = as.numeric(year))
+
+# Reading WHR(World Happiness Record) data
+
+whr <- read_excel("data/healtheconomics/wellbeing-otherfactos.xls")
+
+whr <- whr %>%
+  clean_names() %>%
+  mutate(WHR = life_ladder / 10)
+
+# Comparison data
+
+comparison1 <- whr %>%
+  left_join(hdi, by = c("country_name" = "country", "year")) %>%
+  select(country_name, year, 13:15)
+
+comparison <- comparison1 %>%
+  pivot_longer(cols = c(3, 5),
+               names_to = "organisation",
+               values_to = "score")
+
+comparison$organisation[comparison$organisation == "WHR"] <-
+  "Life Ladder Score"
+comparison$organisation[comparison$organisation == "HDI"] <-
+  "Human Development Index"
+
+filtered <- comparison %>%
+  filter(country_name %in% c(
+    "Australia",
+    "Afghanistan",
+    "India",
+    "Pakistan"))
+
+
+```
+
+```{r include=FALSE}
+
+country_comparison_plot <- ggplot(data = filtered,
+       aes(x = year,
+           y = score,
+           color = organisation)) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  scale_y_continuous(labels = scales::label_percent()) +
+  scale_color_manual(values = c(
+    "Human Development Index" = "#d73027",
+    "Life Ladder Score" = "#4575b4")) +
+  labs(
+    title = toupper("Measuring Wellbeing"),
+    subtitle = paste(
+      "The UN's **<span style=\"color:#d73027\">Human Development Index</span>** is a leading indicator for measuring a country’s progress",
+      "and includes life expectancy and income per capita. But the **<span style=\"color:#4575b4\">Life Ladder Score</span>**, measured by",
+      "the annual World Happiness Report, asks survey respondents to rate their lives.",
+      "It often tells a very different story.",
+      sep = "<br>"),
+    y = "Score",
+    caption = paste(
+      "**CHART:** Ambalika Gupta & James Goldie, 360info",
+      "**DATA:** UNDP & World Happiness Report",
+      sep = "<br>"
+    )
+  ) +
+  facet_wrap(~ country_name,
+               ncol = 2) +
+  theme_360() +
+  theme(
+    legend.position = "top",
+    legend.direction = "horizontal",
+    axis.title.x = element_blank(),
+    legend.title = element_blank(),
+    legend.key.width = unit(1, "cm"),
+    panel.background = element_rect(fill = "#fcfcfc", colour = NA),
+    panel.spacing.x = unit(1, "cm"),
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    strip.text = element_text(face = "bold"),
+    plot.margin = margin(0.5, 0.5, 1, 0.5, "cm"),
+    plot.subtitle = element_markdown(
+      family = "Body 360info", face = "plain", color = "black")
+  )
+
+save_360plot(country_comparison_plot, "wellbeing.png", shape = "sdtv-landscape")
+
+```
 
 ---
 
