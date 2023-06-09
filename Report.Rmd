@@ -1,0 +1,627 @@
+---
+title: |
+  <br>**Data Analysis Revolutionising Journalism**
+author: |
+  | Author: Ambalika Gupta 
+  | Supervisor: James Goldie, 360info
+date: "07/06/20211"
+output: rmdformats::readthedown
+---
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo=FALSE, 
+                      message=FALSE,
+                      error = FALSE,
+                      warning=FALSE,
+                      eval= TRUE,
+                      fig.align = "center")
+```
+
+```{r include=FALSE}
+
+library(tidyverse)
+library(naniar)
+library(plotly)
+library(janitor)
+library(readr)
+library(ggplot2)
+library(dplyr)
+library(sf)
+library(rnaturalearthdata)
+library(rnaturalearth)
+library(readxl)
+library(viridis)
+library(themes360info)
+library(rio)
+library(ggtext)
+library(ggpattern)
+library(colorspace)
+library(kableExtra)
+library(gifski)
+library(scales)
+
+```
+
+# Background of Organisation and Scope of Work within Internship : 
+
+360info is an open-access global information agency that addresses the world's biggest challenges and offers practical and research-based solutions. It is a digital wire which publishes and broadcasts its content under the  Creative Commons 4.0 license which is very flexible in terms of publishing academic content. 
+
+Each week there is a Special Report wherein 5-10 articles are published addressing a key problem existing globally. The article would majorly focus on Asia Pacific region. The report is data analysis driven supported with graphics and data visualizations and other interactives. 
+
+Our scope of work was defined but not limited to the below:
+
++ Exploratory data analysis: We discuss with the editors and understand the key problem and the aim of the report. We would research articles and licensed datasets(for further reproducibility) and conduct exploratory data analysis on the shortlisted datasets.  
++ Data Wrangling support: Few datasets are in ready-to-use formats while most datasets need tidying or combining two or more datasets for use in graphics. This is done after finalising the datasets and visualisation with the editors. 
++ Graphics: The idea behind a visualisation is to build something that is easy to understand and consistent with traditional graphics and is meaningful for the reader that can be related to the key problem. Our first draft of graphics consists of multiple trial and errors post in which we finalise the potential visualisations with our team and supervisor and undergo multiple reiterations to finalise a visualization that is ready to publish. 
+
+During the internship I have had the opportunity to work on two key global issues: 
+
++ Child Marriage during Covid-19 
++ Economics of Well Being
+
+# Topic 1: Child Marriage during Covid-19 
+
+## Aim 
+The aim of this key problem is to understand the global impact that Covid-19 had globally due to various factors and what are the legal policies globally regarding child marriage.
+
+## Background
+Covid-19 not only had an impact on the economy and health but it also amplified the already existing social issues in society like Covid-19. As per UNICEF, it was estimated that an additional 10 million girls were at risk of child marriage during Covid-19. 
+As per the study, it was shown that the rate of child marriage had dropped by 15% in the last 10 years. If this statistic would mean that we have taken two steps back from the progress made for the eradication of child marriage over the years. This can be attributed to the rising poverty, loss of jobs, closure of schools, economic problems, lack of access to basic amenities and services, unplanned pregnancy, and early parental deaths of minor girls, which has led to an increase in child marriages globally. An already distressed economy with an overburdened health system would also have impacted the health of these newly married brides due to poor health services, and travel restrictions especially since most cases take place in rural or other remote areas. It is estimated that today, around 650 million girls were married off during their childhood. Child marriage is a key UN Sustainable Development Goal and Covid-19 has threatened that progress, the efforts to curb this issue must be ramped up and accelerated. The various ways suggested during Covid-19 to tackle these issues were the reopening of schools, effective implementation of laws related to child marriage, and full access to healthcare and social services.
+
+## Exploratory Data Analysis
+
+### Minimum legal age of marriage without consent
+**Aim:** To explore countries where the minimum legal age of marriage is less than 18
+
+**About:** This dataset is part of the Minimum Gender Dataset compiled by the United Nations Statistics Division.
+
+```{r}
+
+legal_age <- read_csv("data/child_marriage/legal_age.csv")
+
+legal_b18 <- legal_age %>% 
+  filter(comment_obs <18)
+
+ggplotly(
+  (ggplot(legal_b18, aes(fill=sex_desc, y=comment_obs, x=ref_area_desc)) + 
+    geom_bar(aes(text = paste('Country: ', ref_area_desc, '<br>',
+                              'Minimum Age: ', comment_obs, '<br>', 
+                              'Gender: ', sex_desc)),
+      position="dodge",
+      stat="identity") +
+  theme(axis.text.x = element_text(angle = 45 , vjust = 0.5, hjust=1)) +
+  xlab("Country") +
+    ylab("Legal Age for Marriage") + 
+  ggtitle("Countries with minimum legal marriage age less than 18")),
+  tooltip = "text"
+)
+
+```
+
+**Observations:** 
+We can observe that most countries where the legal marriage age is even less than 18 are mostly Asian countries and European island countries. It is mostly observed that Asian countries have long-term traditions and customs which include social stigmas like child marriage due to which such issues still exist in society. Many countries which are dominantly Islamic have high rates of child marriages due to customs existing within religion. 
+
+**Source of Dataset:** [United Nations](https://gender-data-hub-2-undesa.hub.arcgis.com/datasets/8ba8255a4ba047fcb0e6dbe8041a0eb0/explore)
+
+### Covid-19 Stringency
+
+**About:** The stringency index is a composite measure based on nine response indicators including school closures, workplace closures, and travel bans, rescaled to a value from 0 to 100 (100 = strictest). Timeline: 2020-2022
+
+**Aim:** To explore which countries had the strictest government policies in terms of school closures and other lockdown measures
+
+```{r}
+
+stringency <- read_excel("data/child_marriage/stringency.xlsx")
+
+stringencyf <- stringency %>% 
+  na.omit() %>% 
+  group_by(continent, location, population) %>% 
+  summarise(value = mean(stringency_index)) %>% 
+  mutate(value = as.numeric(value))
+
+countries <- ne_countries(returnclass = "sf", scale = "medium")
+covid <- ne_countries(returnclass = "sf", scale = "medium") %>% 
+  select(admin) %>% 
+  left_join(stringencyf, by = c("admin" = "location"))
+
+
+ggplotly(ggplot()+
+  geom_sf(covid , mapping = aes(fill = value, text = admin)) + 
+    scale_fill_viridis_c(option = "viridis") +
+  labs(title = "Covid-19 Stringency"))
+
+```
+
+**Observations:** 
+We can observe most South Asian countries and North African countries has high stringency index. 
+China has the highest stringency index. 
+In contrast, it is observed most Central African countries like Chad, Mali, and Asian countries like Yemen and Afghanistan had the lowest stringency index, and yet these countries have the highest number of child marriages globally.  
+
+**Source of Dataset:** [Our World in Data](https://ourworldindata.org/metrics-explained-covid19-stringency-index)
+
+
+
+### Legal Policies Regarding Child Marriage 
+
+**Aim:** To understand the policies regarding child marriage globally. Timeline: 2019
+
+**Data Dictionary:** spec_tbl_df [131 x 33]
+
+* iso_a3  : ISO3 Country Code
+* Entity  : Country Name
+* Year    : Year
+* Law     : Legal code
+
+```{r warning=FALSE}
+law_2 <- read_csv("data/child_marriage/law_2.csv")
+law_2 <- ne_countries(returnclass = "sf", scale = "medium") %>% 
+  select(iso_a3) %>% 
+  left_join(law_2, by = c("iso_a3" = "Code"))
+
+law_2 <- law_2 %>%
+  mutate(
+    Law = case_when(
+      Law == 0    ~ "Prohibited under 18 without exceptions",
+      Law == 0.25 ~
+        "Prohibited under 18 with exceptions of customs or traditional laws",
+      Law == 0.5  ~ "Prohibited under 18 with legal exceptions regarding consent",
+      Law == 0.75 ~ "Allowed",
+      Law == 1    ~ "Allowed for girls only"))
+
+ggplot()  +
+  geom_sf(law_2 , mapping = aes(fill = as.factor(Law), text = Entity))  +
+    scale_fill_manual(values=c("#e31a1c", "#fd8d3c", "#fecc5c", "#ffffb2","#78c679"), name = "Legal Policy") +
+    labs(
+    title = "Legal Policy Regarding Child Marriage Across the World")+
+    theme_bw()+
+  theme(legend.position = "bottom",
+    panel.grid = element_blank(),
+    plot.margin = margin(),
+    plot.title = element_text(face = "bold"))
+
+```
+
+**Observations:**
+
++ Even most advanced countries like the USA allow child marriage.
++ Nordic countries like Switzerland, Denmark, and Sweden are the only countries that completely prohibit child marriage irrespective of any customs or legal exceptions.
++ Middle-East countries which are mostly Islamic dominant countries like Yemen, Saudi Arabia, and Iran, and African countries like Sudan allow child marriages.
++ Most African countries like Mali, and Tanzania and, Asian countries like Taiwan, Malaysia, Pakistan, and Afghanistan allow girl-child marriages.
+
+**Source:** [Our World in Data](https://ourworldindata.org/grapher/laws-on-child-marriage)
+
+### Global Child Marriage Rate
+
+**About:** This dataset is part of the Global SDG Indicator Database compiled through the UN System in preparation for the Secretary-General's annual report on Progress towards Sustainable Development Goals. This dataset contains the latest value of the child marriage rate from 2005-2022.
+Indicator 5.3.1: Proportion of women aged 20–24 years who were married or in a union before age 15 and before age 18
+Target 5.3: Eliminate female social issues like child marriage, female gender mutilation
+Goal 5: Achieve gender equality and empower all women and girls
+
+**Data Dictionary:** spec_tbl_df [131 x 33]
+* geoAreaCode : num [1:131] Country Code
+* geoAreaName : chr [1:131] Country Name
+* level_      : num [1:131] Numeric
+* parentCode  : num [1:131] Numeric
+* parentName  : chr [1:131] Sub Continental Region
+* type        : chr [1:131] Geographical level
+* X           : num [1:131] Latitude
+* Y           : num [1:131] Longitude
+* ISO3        : chr [1:131] ISO3 country code
+* latest_value: num [1:131] Child Marriage Rate
+
+```{r data}
+
+w_18 <- read_csv("data/child_marriage/w_18.csv")
+
+w_18 <- w_18 %>% 
+  select(geoAreaCode, geoAreaName, parentCode, parentName, ISO3, latest_value)
+
+law_2 <- read_csv("data/child_marriage/law_2.csv")
+
+cmf <- law_2 %>% 
+  left_join(w_18, by = c("Code" = "ISO3"))
+
+countries <- ne_countries(returnclass = "sf", scale = "medium")
+
+cmf1 <- countries %>% 
+  select(iso_a3) %>% 
+  left_join(cmf, by = c("iso_a3" = "Code")) %>% 
+  drop_na(Law)
+
+cmf %>%
+  mutate(
+    LawStr = case_when(
+      Law == 0    ~ "Prohibited",
+      Law == 0.25 ~
+        "Prohibited, but encouraged\nby some customary or\ntraditional laws",
+      Law == 0.5  ~ "Prohibited, but with legal\nexceptions around consent or\nsome groups of women",
+      Law == 0.75 ~ "Allowed",
+      Law == 1    ~ "Allowed for girls only")) ->
+  cmf
+
+
+```
+
+
+```{r visualisation}
+
+rate_map <- ggplot() +
+ geom_sf(data = countries, fill = "grey", colour = "black") +
+  geom_sf(
+    mapping = aes(fill = latest_value, text = Entity),
+    data = cmf1,
+    stat = "sf",
+    position = "identity",
+    colour = "black"
+    ) +
+  scale_fill_fermenter(
+    name = NULL,
+    palette = "YlOrBr",
+    direction = 1,
+    labels = scales::label_number(suffix = "%"),
+    na.value = "grey") + 
+  labs(
+    title = "Child Marriage: % women aged 20-24 married before 18 (2005-2020)") +
+  theme(
+    legend.position = c(0.15, 0.45),
+    legend.direction = "vertical",
+    legend.box = "horizontal",
+    legend.key.width = unit(1, "cm"),
+    legend.text = element_text(face = "bold"),
+    panel.grid = element_blank(),
+    plot.margin = margin()
+  )+
+  theme_bw()
+
+ggplotly(rate_map)
+
+```
+
+
+**Observations:**
++ We can observe most African countries have some of the highest rates of child marriages with countries like Chad, and Niger displaying the highest rate followed by Sudan, Mozambique, Nigeria, etc.
++ Among Asian countries, Bangladesh has the highest child marriage rate.
+
+**Source:** [UN DESA Statistics Division](https://unstats-undesa.opendata.arcgis.com/datasets/undesa::indicator-5-3-1-proportion-of-women-aged-20-24-years-who-were-married-or-in-a-union-before-age-18-percent/explore?location=2.960853%2C1.735981%2C2.67)
+
+
+### Child Marriage Rate in Sub-continental region during Covid-19
+
+**About:** This dataset contains the Percentage of women (aged 20-24 years) married or in union before age 18 during the Covid-19 period in sub-continental regions. 
+
+```{r echo=FALSE, warning=FALSE, message= FALSE}
+
+child_marriage <- read_csv("data/child_marriage/child_marriage.csv")
+
+child_covid <- child_marriage %>%
+  clean_names()
+
+child_covid <- child_covid %>%
+  filter(time_period_time_period == 2021) %>%
+  filter(!geographic_area %in% c("Fiji", "Denmark", "Singapore", "Least developed countries", "World"))
+
+ggplot(data = child_covid, aes(
+  y = reorder(geographic_area, obs_value_observation_value),
+  x = obs_value_observation_value
+)) +
+  geom_bar(fill = "steelblue",
+           stat = "identity") +
+  geom_text(
+    aes(label = obs_value_observation_value),
+    hjust = 1.5,
+    color = "black",
+    size = 4
+  ) +
+  scale_y_discrete(labels = label_wrap(15)) +
+  labs(title = paste("Child Marriage Rate in Sub Continental Region", "during Covid-19", sep ="\n"),
+       caption = "UNICEF Data") +
+  theme(axis.text.x = element_text(
+    angle = 90,
+    vjust = 0.5,
+    hjust = 1,
+  ),
+  legend.position = "none") +
+  xlab("Child Marriage Rate") +
+  ylab("Region") +
+  theme_bw()
+
+```
+
+
+**Observation:** We can observe that African countries show the highest rate of child marriage during Covid-19 followed by South Asian countries and Latin American countries. 
+
+**Data Source:** [UNICEF Data](https://data.unicef.org/resources/data_explorer/unicef_f/?ag=UNICEF&df=GLOBAL_DATAFLOW&ver=1.0&dq=.PT_F_20-24_MRD_U15+PT_F_20-24_MRD_U18+PT_F_15-19_MRD..&startPeriod=2016&endPeriod=2022)
+
+
+## Final Visualisation: % women aged 20-24 married before 18 (average 2005-2020) and the legal policy regarding child marriage
+
+```{r echo = FALSE, fig.align="center", warning=FALSE, message=FALSE, echo=FALSE, out.height="450px", out.width="680px"}
+knitr::include_graphics("combined_map.png")
+```
+
+
+### Methodology
+
+Our initial task was researching datasets related to child marriage, particularly during Covid-19. Followed by data wrangling for tidying data and combining datasets for the final visualization. The above visualisations were the initial drafts for the editor’s reference and have played a crucial role in arriving at the final visualisation.
+In order to understand the contrast between the child marriage rate across the globe and the legal policy existing in each country, we wanted to create one visualisation which could display both. 
+Use of map created using spatial polygon maps using **rnatural** package with a continuous colour scale to display the child marriage trend along with the **ggpattern** package(a new package I explored during my internship) which allowed me to represent each unique policy in a different pattern along with the child marriage rate for each country within the same visual. 
+We also tried to explore more ways of creating world map visualizations with dual variables using software called QGIS which allows us to put layers of vectors on top of spatial polygons of countries(This experiment was non-conclusive as we decided with the above methodology).
+
+This was rejected for the following reasons:
+
++ The package shifted in the last few weeks toward primarily being about the impact of Covid on child marriage, so having figures from before the pandemic was less attractive to the editors.
++ The rates are actually the latest available data per country, which ranges from 2005 to 2020. So a lot of countries are 10+ years out of date. It’s just too old for us to run in a package about Covid and child marriage.
+
+## Conclusion 
+
+Out of 41 countries that have high rates of child marriages, 30 countries are in Africa. Data speaks for itself, African countries have the highest rates of child marriages globally and have a poor implementation of child marriage laws despite the prohibition of child marriages in most countries. These girls mostly belong to marginalised families. Most African countries have poor economic conditions and have militarized zones with no access to health, education, and other basic amenities. Most militarized African countries with armed conflicts have high rates of poverty and poor education system which can be attributed to high rates of child marriage. Certain religious and cultural traditions and customs which allow child marriage has been ongoing for decades and are still highly prevalent in the rural areas of African countries. For most families, it is a source of survival. Not only legal but social and economic reforms must also be implemented to ensure that child marriage is not the last option for a family.
+Mozambique has launched an initiative called the “Girls Forum”, which is a platform to empower girls, learn about society, understand the institution of marriage, and sexual and reproductive health, and improve their decision-making abilities. 
+The African Union and the End Child Marriage campaign: The aim of this campaign is to end child marriage through the effective implementation of policies, promotion of human rights, spreading more awareness in society through advocacy, and working on removing the barriers to eradicating child marriage.
+
+Bangladesh had the highest child marriage rate amongst all Asian countries and is rated fourth highest globally. In Bangladesh, 59% of girls get married before the age of 18 and this number has only been exponentially increasing ever since the pandemic. The informal sector, which is the main source of livelihood for almost 85 percent of Bangladeshis, was hit badly during Covid-19, leading to poor economic conditions and thereby leading to an increase in the child marriage rate. Also, Covid-19 was a boon for many families who wanted a small wedding with less dowry and expenditure on marriage. In countries, which are more traditional, the price of dowry increases as the girl gets older, hence the parents deem it suitable to marry the girl off at a young age. Proper enforcement of the law is not prevalent in Bangladesh which prohibits child marriage with exceptions in special circumstances which comes under The Amendment of the Child Marriage Restraint Act in 2017. People believe the clause is to underreport the actual rate of child marriage taking place in the country. 
+
+We can observe that most countries with the highest child marriage rate are in Africa, wherein most countries’ legal policy says that child marriage is prohibited with legal exceptions. The clause for legal exceptions makes it easier to hide the actual figures for child marriage within the country and people have been taking advantage of this flaw for decades. 
+
+## Limitations
+
++ Latest Data for child marriage rate from 2005 - 2022. Some data is obsolete in reference to this date
++ Missing Data for many countries during the Covid-19 period.
+
+
+# Topic 2: The Economics of Well-Being
+
+## Aim 
+
+The aim of this key problem is to understand that is there more to the well-being of a country and the welfare of its people. 
+
+## Background
+
+The traditional way of measuring the progress of a country's economy is by determining the Gross Domestic Product of the country. But in current times, especially Covid-19 has made us realize that there is more to an economy than GDP. There is a need to measure the societal progress of an economy in terms of health, education, social support, and overall life satisfaction. The holistic well-being of a country truly defines the state of the economy and its progress. The concept of wellbeing is often associated with happiness and social welfare of the people which gives us an insight into people’s life. GDP does address issues like income inequality, unequal distribution of resources, the welfare of all classes of people, crime rate, state of the environment, etc in a country. 
+
++ OECD has been working on building a framework for measuring the well-being of an economy since the 1970s. This framework revolves around health, education and skills, gender equality, social protection, and redistribution. 
++ Another framework of well-being is built by the World Happiness Report. This report ranks countries based on their happiness score and their subjective well-being. It estimates this score based on various factors like income, life expectancy, social support, freedom, generosity, and perceptions of corruption. It believes that subjective well-being is measured through life evaluations and our emotions - positive and negative. This is a survey conducted globally, wherein people are asked to rate their lives on a scale of 1-10, they are also asked questions about the above factors like income, life expectancy, etc. It is then estimated how much these factors contributed to the Happiness Score taking into account that there may be other factors influencing the score as well which is incorporated as residual. 
++ Human Development Index is a composite measure developed by the United Nations Development Programme (UNDP) to evaluate the human development level of countries. The index score is calculated by taking into account life expectancy, income and education. HDI offers a broader perspective on human development and the welfare of people than the GDP.
+
+## Exploratory Data Analysis
+
+### Top 10 happiest country during 2021
+
+```{r read data}
+
+# Reading HDI data
+
+hdi <- read_csv("data/healtheconomics/hdi_timeseries.csv")
+
+hdi <- hdi %>%
+  pivot_longer(cols = 6:37,
+               names_to = "year",
+               values_to = "HDI")
+
+hdi <- hdi %>%
+  select(c(-region,-hdicode,-hdi_rank_2021)) %>%
+  mutate(year = str_remove_all(year, "hdi_")) %>%
+  mutate(year = as.numeric(year))
+
+# Reading WHR(World Happiness Record) data
+
+whr <- read_excel("data/healtheconomics/wellbeing-otherfactos.xls")
+
+whr <- whr %>%
+  clean_names() %>%
+  mutate(WHR = life_ladder / 10)
+
+# Comparison data
+
+comparison1 <- whr %>%
+  left_join(hdi, by = c("country_name" = "country", "year")) %>%
+  select(country_name, year, 13:15)
+
+comparison <- comparison1 %>%
+  pivot_longer(cols = c(3, 5),
+               names_to = "organisation",
+               values_to = "score")
+
+comparison$organisation[comparison$organisation == "WHR"] <-
+  "Life Ladder Score"
+comparison$organisation[comparison$organisation == "HDI"] <-
+  "Human Development Index"
+
+```
+
+
+```{r}
+
+comparison1 %>%
+  filter(year == 2021) %>% 
+  select(-iso3, -year) %>%
+  mutate(WHR = round(WHR, digits = 2), HDI = round(HDI, digits = 2)) %>% 
+  arrange(desc(WHR))%>%
+  rename("Country" = country_name) %>%
+  head(10) %>% 
+  kable(caption = "Top 10 Countries with highest Happiness Score
+        ")
+
+```
+
+
+**Observations:** 
+We can observe that Scandinavian countries like Finland, Denmark, Norway, and Switzerland have the highest happiness score. This can be attributed to the fact that these countries focus on building an economy that has sustainable development and healthy work-life balance with more focus on holistic well-being. 
+
+### Top 10 Countries with the lowest scores during 2021
+
+```{r}
+
+comparison1 %>%
+  filter(year == 2021) %>% 
+  select(-iso3, -year) %>%
+  mutate(WHR = round(WHR, digits = 2), HDI = round(HDI, digits = 2)) %>% 
+  arrange(-desc(WHR))%>%
+  rename("Country" = country_name) %>%
+  head(10) %>% 
+  kable(caption = "Top 10 Countries with lowest Happiness Score
+        ")
+
+```
+
+**Observations:** We can observe that countries with the lowest scores like Afghanistan and Lebanon are war-ridden countries with deep unrest in the economy and people of the country are struggling to survive with a lack of access to basic amenities, no freedom of expression, and a poor health system.
+South Asian and Middle-East Asian countries and African countries have the lowest happiness score. Most of them are developing nations that were badly hit by the Covid-19 wave and have  
+
+#### Interesting Fact 
+
+We observe that India being the 6th largest economy in the world has one of the lowest happiness scores during 2021. This can be attributed to the fact that India was one of the worst-hit countries due to Covid-19 and an overburdened healthcare system and economic distress due to the lockdown has made the situation worse. Life expectancy dropped considerably due to the after-effects of the pandemic. The lockdowns contributed to the worsening of the mental health of people due to being confined within their homes with no mobility. People lost their jobs and were struggling to survive. Poverty-stricken people almost became destitute. A flourishing and promising economy retreated two steps back. Generosity and goodwill was an important factor which kept this economy afloat.
+
+### Factor composition of Happiness Score of top 5 Economies in the world
+
+**Aim:** The aim of this visualisation is to observe the factor composition of happiness score of top 5 economies in the world.
+
+
+```{r}
+
+whrfactor <- import_list("data/healtheconomics/2015_a.xlsx" , rbind=TRUE)
+
+whrfactor <- whrfactor %>% 
+  select(-`_file`)
+
+whrfactor <- whrfactor %>% 
+  pivot_longer(
+    cols = 2:9,
+    names_to = "factor",
+    values_to = "value"
+  )
+
+whrfactor <- whrfactor %>% 
+  mutate(factor = recode(factor,
+    "GDP_per_capita" = "GDP Per Capita",
+    "social_support" = "Social Support",
+    "life_expectancy" = "Life Expectancy",
+    "freedom" = "Freedom",
+    "generosity" = "Generosity",
+    "corruption_view" = "Corruption"
+  ))
+
+whrfac <- whrfactor %>%
+  filter(factor != c("residual", "score"))
+
+gdp1 <-  whrfac %>% 
+  filter(country %in% c("United States", "China", "Japan", "Germany", "United Kingdom"), year == 2021)
+
+ggplot(data = gdp1, aes(fill = factor, x = country, y = value)) +
+  scale_fill_manual(
+    values = c("#7fc97f",
+               "#beaed4",
+               "#fdc086",
+               "#ffff99",
+               "#386cb0",
+               "#f0027f"
+    ),
+    name = "Happiness Factors"
+  ) +
+  geom_bar(position = "stack", stat = "identity") +
+  labs(title = "World Happiness Score(2021) : Factor composition", y = "Index/Score") +
+  theme_bw() +
+  theme(legend.position = "bottom",
+        axis.title.x = element_blank())
+
+```
+
+**Observation:**
+
++ We can observe that apart from GDP, other factors have a significant contribution to the happiness score of top 5 economies in the world. With GDP having maximum contribution followed by social support and life expectancy.
++ Freedom also has considerable contribution to the happiness score. It is important for people to be able to voice their opinion and be heard by their government and people around them in order to feel respected and valued. This is constitutes as personal well-being.
++ As this data is recorded after 2021, people have taken health into serious consideration while evaluating life and well-being. Pandemic has had an impact on people's outlook of life. 
+
+
+## Final Visualisation: Measuring Well-Being
+
+### Aim 
+To compare two frameworks of measuring well-being, the Human Development Index and the World Happiness Score. Are the stats shown by our policymakers actually reflecting the true well-being and welfare of the people?
+
+```{r echo = FALSE, fig.align="center", warning=FALSE, message=FALSE, echo=FALSE}
+
+knitr::include_graphics("wellbeing.png")
+
+```
+
+### Methodology
+The aim was to observe the trend of HDI and Happiness Score(Life Ladder Score) over the past years. While HDI is more quantitative and defined and Happiness Score is more subjective based on well-being, the difference in trends of both the scores speaks volumes. Unlike the first topic, the idea behind this visualisation was conceived from the start once the datasets had been shortlisted. The countries in this visualisation were shortlisted based on the unique trend observed amongst all the countries. The above visualisation has been published on the 360info website: https://360info.org/comparing-wellbeing-measurements/
+
+### Observation
+
++ We can observe that Australia has a linear trend for both scores yet has a considerable difference, from which we can infer that the data as given by the government is not completely accurate and that the actual well-being of people takes into account emotions, health, freedom, and other factors too. 
++ Most South East Asian countries like Pakistan, Afghanistan, Malaysia, etc showed an unsteady trend as compared to the Human Development Index which shows a linear trend, which shows that people’s subjective well-being may not necessarily correlate with the UNDP’s measurement of well-being. 
++ Pakistan is a debt-ridden economy with a lack of basic resources. This can also be attributed to the unstable and fragile politics existent in the country. There is a lack of freedom among women due to a patriarchal system. These factors are strong evidences for the unsteady trend in the happiness score. 
+
+
+## Conclusion
+
+The economics of well-being is a strong tool for future policymakers to design policies for the development of a country around factors other than GDP. Considering the well-being of the people, the government should focus more on health, education, social welfare infrastructure, and environmental sustainability. A clean environment prevents diseases which can improve health and thereby improve quality of life. It helps build a more inclusive society by addressing issues of income inequality and promoting social inclusion. This contributes to the overall well-being of the society. This concept is a paradigm shift from a traditional way of measuring economic development to a more inclusive and sustainable economic system.
+
+## Source of Dataset
+
+[World Happiness Report](https://worldhappiness.report/ed/2022/)
+
+[Human Development Index](https://hdr.undp.org/data-center/human-development-index#/indicies/HDI)
+
+## Limitations
+
+#### Human Development Index
+
+While *HDI* takes into account other factors of well being like income, health and wealth, it has certain limitations:
+
++ It does not take into account other factors of social welfare like freedom, generosity, gender inequality, etc.
++ It is more quantitative than qualitative. It may not necessarily address the nuances of human development like human rights and quality of life rather than life expectancy.
+
+#### World Happiness Report
+
+**World Happiness Report** has its own limitations:
+
++ Subjective: It addresses self-reported scores which can be influenced by various other social factors than the ones they have taken into account. It has social bias and different interpretations of the same factor
++ Limited factors are taken into consideration apart from the ones mentioned above. 
++ Cultural differences: Different societies may have different definitions of social factors used for measuring happiness. The score does not take into account the social and cultural factors affecting happiness.
+
+# References
+
++ UNICEF. (2021) 10 million additional girls at risk of child marriage due to COVID-19, UNICEF. Available at: https://www.unicef.org/eap/press-releases/10-million-additional-girls-risk-child-marriage-due-covid-19-unicef
+
++ Onabanjo, J., Kalasa, B., & Abdel-Ahad, M. (2014, May 28). OP-ED: ENDING CHILD MARRIAGE IN AFRICA CAN NO LONGER WAIT. Global Information Network Retrieved from https://www.proquest.com/wire-feeds/op-ed-ending-child-marriage-africa-can-no-longer/docview/1534961300/se-2
+
++ KAMAL, S. M. M., HASSAN, C. H., ALAM, G. M., & YING, Y. (2015). CHILD MARRIAGE IN BANGLADESH: TRENDS AND DETERMINANTS. Journal of Biosocial Science, 47(1), 120-39. doi:https://doi.org/10.1017/S0021932013000746
+
++ Afrin, Tangina, & Zainuddin, Mohammad. (2021). Spike in child marriage in Bangladesh during COVID-19: Determinants and interventions. Child Abuse & Neglect, 112, 104918–104918. https://doi.org/10.1016/j.chiabu.2020.104918
+
++ The economy of wellbeing: what is it and what are the implications for health? BMJ 2020; 369 doi: https://doi.org/10.1136/bmj.m1874
+
++ Pebesma, E., & Bivand, R. (2023). Spatial Data Science: With Applications in R (1st
+  ed.). Chapman and Hall/CRC. https://doi.org/10.1201/9780429459016
+
++ Zeileis A, Fisher JC, Hornik K, Ihaka R, McWhite CD, Murrell P, Stauffer R, Wilke CO
+(2020). “colorspace: A Toolbox for Manipulating and Assessing Colors and Palettes.”
+_Journal of Statistical Software_, *96*(1), 1-49. doi: 10.18637/jss.v096.i01 (URL:
+https://doi.org/10.18637/jss.v096.i01).
+
++ Chan, C., Geoffrey CH Chan, Leeper, T.J. and Becker, J. (2021). rio: A Swiss-army knife for data file I/O.
++ FC, M., Davis, T.L. and ggplot2 authors (2022). ggpattern: ‘ggplot2’ pattern geoms. [online] Available at: https://cran.r-project.org/package=ggpattern.
++ Firke, S. (2023). janitor: Simple tools for examining and cleaning dirty data. [online] Available at: https://cran.r-project.org/package=janitor.
++ Garnier, Simon, Ross, Noam, Rudis, Robert, Camargo, Pedro, A., Sciaini, Marco, Scherer and Cédric (2021). viridis - colorblind-friendly color maps for r. [online] doi:https://doi.org/10.5281/zenodo.4679424.
++ Massicotte, P. and South, A. (2023). rnaturalearth: World map data from natural earth. [online] Available at: https://cran.r-project.org/package=rnaturalearth.
+Ooms, J. (2022). gifski: Highest quality GIF encoder. [online] Available at: https://cran.r-project.org/package=gifski.
++ Sievert, C. (2020). Interactive web-based data visualization with r, plotly, and shiny. [online] Chapman and Hall/CRC. Available at: https://plotly-r.com.
++ Tierney, N. and Cook, D. (2023). Expanding tidy data principles to facilitate missing data exploration, visualization and assessment of imputations. Journal of Statistical Software, 105, pp.1–31. doi:https://doi.org/10.18637/jss.v105.i07.
++ Wickham, H. (2016). ggplot2: Elegant graphics for data analysis. [online] Springer-Verlag New York. Available at: https://ggplot2.tidyverse.org.
++ Wickham, H., Averick, M., Bryan, J., Chang, W., Lucy D'Agostino McGowan, Romain François, Grolemund, G., Hayes, A., Henry, L., Hester, J., Kuhn, M., Thomas Lin Pedersen, Miller, E., Stephan Milton Bache, Kirill Müller, Ooms, J., Robinson, D., Dana Paige Seidel, Vitalie Spinu and Takahashi, K. (2019). Welcome to the tidyverse. Journal of Open Source Software, 4, p.1686. doi:https://doi.org/10.21105/joss.01686.
++ Wickham, H. and Bryan, J. (2023). readxl: Read excel files. [online] Available at: https://cran.r-project.org/package=readxl.
++ Wickham, H., Hester, J. and Bryan, J. (2023). readr: Read rectangular text data. [online] Available at: https://cran.r-project.org/package=readr.
++ Wickham, H., Romain François, Henry, L., Kirill Müller and Vaughan, D. (2023). dplyr: A grammar of data manipulation. [online] Available at: https://cran.r-project.org/package=dplyr.
++ Wickham, H. and Seidel, D. (2022). scales: Scale functions for visualization. [online] Available at: https://cran.r-project.org/package=scales.
++ Wilke, C.O. and Wiernik, B.M. (2022). ggtext: Improved text rendering support for ‘ggplot2’. [online] Available at: https://cran.r-project.org/package=ggtext.
++ Zhu, H. (2021). kableExtra: Construct complex table with ‘kable’ and pipe syntax. [online] Available at: https://cran.r-project.org/package=kableExtra.
+
+
+
+
+
+
+
+
+

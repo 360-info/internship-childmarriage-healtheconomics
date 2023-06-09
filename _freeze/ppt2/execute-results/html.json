@@ -1,0 +1,14 @@
+{
+  "hash": "c72340e3fcc258d996225b35339ced03",
+  "result": {
+    "markdown": "---\ntitle: \"Data Analysis Revolutionizing Journalism\"\nsubtitle: \"ETC5543 Internship Presentation\"  \nauthor: \"Ambalika Gupta\"\ndate: '2023-06-06'\noutput:\n  xaringan::moon_reader:\n    css: xaringan-themer.css\n    lib_dir: libs\n---\n\n\n\n\n# Organisation: 360info\n\n## Background \n360info is an open access global information agency that tackles the world’s biggest challenges and offers practical solutions.\n\n### Role \nContribute to a Special Report made up of 5-10 articles looking at different aspects of, or solutions to, the problem in the following ways:\n\n* Exploratory Data Analysis\n* Data Wrangling support\n* Graphics\n\n---\n\n# Topic 1: Child Marriage during Covid-19\n\n\n::: {.cell}\n\n```{.r .cell-code}\nknitr::include_graphics(\"a671ef113453405.602812dd47b65.jpg\")\n```\n\n::: {.cell-output-display}\n![](a671ef113453405.602812dd47b65.jpg){width=744}\n:::\n:::\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}
