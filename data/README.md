@@ -29,35 +29,40 @@ This dataset contains minimum legal age for marriage without consent
 
 ## Filename: law_2.csv : "Laws for Child marriage(2019)"
 
-### Description: Legal provisions for child marriage, 2019
+### Description: 
+Legal provisions for child marriage, 2019
 
 ### URL: [Our World in Data](https://ourworldindata.org/grapher/laws-on-child-marriage)
 
 
 ## Filename: stringency.xlsx : Covid-19 Stringency Index
 
-### Description: COVID-19: The stringency index is a composite measure based on nine response indicators including school closures, workplace closures, and travel bans, rescaled to a value from 0 to 100 (100 = strictest). 
+### Description: 
+COVID-19: The stringency index is a composite measure based on nine response indicators including school closures, workplace closures, and travel bans, rescaled to a value from 0 to 100 (100 = strictest). 
 
 ### URL: [Our World in Data](https://ourworldindata.org/metrics-explained-covid19-stringency-index)
 
 
 ## Filename: hdi_timeseries.xlsx : Human Development Index by UNDP
 
-### Description: The Human Development Index (HDI) is a summary measure of average achievement in key dimensions of human development: a long and healthy life, being knowledgeable and having a decent standard of living. The HDI is the geometric mean of normalized indices for each of the three dimensions. 
+### Description: 
+The Human Development Index (HDI) is a summary measure of average achievement in key dimensions of human development: a long and healthy life, being knowledgeable and having a decent standard of living. The HDI is the geometric mean of normalized indices for each of the three dimensions. 
 
 ### URL: [UNDP](https://hdr.undp.org/data-center/human-development-index#/indicies/HDI)
 
 
 ## Filename: 2015_a.xlsx : World Happiness Report
 
-### Description: This report ranks countries based on their happiness score and their subjective well-being. It estimates this score based on various factors like income, life expectancy, social support, freedom, generosity, and perceptions of corruption. It believes that subjective well-being is measured through life evaluations and our emotions - positive and negative.
+### Description: 
+This report ranks countries based on their happiness score and their subjective well-being. It estimates this score based on various factors like income, life expectancy, social support, freedom, generosity, and perceptions of corruption. It believes that subjective well-being is measured through life evaluations and our emotions - positive and negative.
 
 ### URL: [World Happiness Report](https://worldhappiness.report/ed/2022/)
 
 
 ## Filename: wellbeing-otherfactos.xlsx : World Happiness Report
 
-### Description: This report ranks countries based on their happiness score and their subjective well-being. It estimates this score based on various factors like income, life expectancy, social support, freedom, generosity, and perceptions of corruption. It believes that subjective well-being is measured through life evaluations and our emotions - positive and negative.
+### Description: 
+This report ranks countries based on their happiness score and their subjective well-being. It estimates this score based on various factors like income, life expectancy, social support, freedom, generosity, and perceptions of corruption. It believes that subjective well-being is measured through life evaluations and our emotions - positive and negative.
 
 ### URL: [World Happiness Report](https://worldhappiness.report/ed/2022/)
 
