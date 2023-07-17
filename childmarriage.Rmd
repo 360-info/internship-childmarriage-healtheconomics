@@ -98,7 +98,9 @@ rate_map <- ggplot() +
     plot.margin = margin()
   )
 
-save_360plot(rate_map, "rate_map.png", retina = 4, shape = "sdtv-landscape")
+rate_map
+
+# save_360plot(rate_map, "rate_map.png", retina = 4, shape = "sdtv-landscape")
 
 ```
 
@@ -155,8 +157,10 @@ combined_map <- ggplot() +
     plot.margin = margin()
   )
   
-save_360plot(combined_map, "combined_map.png", retina = 4,
-  shape = "sdtv-landscape")
+combined_map
+
+# save_360plot(combined_map, "combined_map.png", retina = 4,
+  # shape = "sdtv-landscape")
 
 ```
 

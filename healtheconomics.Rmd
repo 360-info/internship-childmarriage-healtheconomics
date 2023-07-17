@@ -73,7 +73,7 @@ filtered <- comparison %>%
     "Pakistan"))
 ```
 
-```{r}
+```{r message=FALSE, warning=FALSE, paged.print=FALSE}
 
 country_comparison_plot <- ggplot(data = filtered,
        aes(x = year,
@@ -119,9 +119,11 @@ country_comparison_plot <- ggplot(data = filtered,
       family = "Body 360info", face = "plain", color = "black")
   )
 
-save_360plot(country_comparison_plot,
-  file.path("out", "six-countries-comparison.png"),
-  shape = "sdtv-portrait")
+country_comparison_plot
+
+#save_360plot(country_comparison_plot,
+ # file.path("out", "six-countries-comparison.png"),
+  # shape = "sdtv-portrait")
 
 ```
 
