@@ -1,7 +1,7 @@
 ---
-title: "healthecon"
+title: "WellBeing Economics"
 author: "Ambalika"
-date: "2023-04-12"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: html_document
 ---
 
@@ -21,10 +21,9 @@ library(plotly)
 library(themes360info)
 library(rio)
 library(ggtext)
-
 ```
 
-```{r readdata}
+```{r read data}
 
 # Reading HDI data
 
@@ -36,10 +35,9 @@ hdi <- hdi %>%
                values_to = "HDI")
 
 hdi <- hdi %>%
-  select(c(-region, -hdicode, -hdi_rank_2021)) %>%
+  select(c(-region,-hdicode,-hdi_rank_2021)) %>%
   mutate(year = str_remove_all(year, "hdi_")) %>%
-  mutate(year = as.numeric(year)) %>%
-  filter(year > 2014)
+  mutate(year = as.numeric(year))
 
 # Reading WHR(World Happiness Record) data
 
@@ -51,394 +49,400 @@ whr <- whr %>%
 
 # Comparison data
 
-comparisonf <- whr %>%
-  left_join(hdi, by = c("country_name" = "country", "year"))
-
-comparisonf <-
-  merge(
-    whr,
-    hdi,
-    by.x = c("country_name", "year"),
-    by.y = c("country", "year")
-  ) %>%
+comparison <- whr %>%
+  left_join(hdi, by = c("country_name" = "country", "year")) %>%
   select(country_name, year, 13:15)
 
-comparison <- comparisonf %>%
+comparison <- comparison %>%
   pivot_longer(cols = c(3, 5),
                names_to = "organisation",
                values_to = "score")
 
 comparison$organisation[comparison$organisation == "WHR"] <-
-  "Happiness Score"
+  "Life Ladder Score"
 comparison$organisation[comparison$organisation == "HDI"] <-
   "Human Development Index"
 
-# For subcontinental comparison
-
-subcon <- ne_countries(returnclass = "sf", scale = "medium") %>%
-  select(admin, iso_a3, subregion, region_wb)
-
-subcon <- merge(comparison, subcon, by.x = "iso3", by.y = "iso_a3")
-
-southasia <- subcon %>%
-  filter(subregion == "Southern Asia")
-
-centralasia <- subcon %>%
-  filter(subregion == "Central Asia")
-
-westernasia <- subcon %>%
-  filter(subregion == "Western Asia")
-
-easternasia <- subcon %>%
-  filter(subregion == "Eastern Asia")
-
-seasia <- subcon %>%
-  filter(subregion == "South-Eastern Asia")
-
-ausnz <- subcon %>%
-  filter(subregion == "Australia and New Zealand")
-
+filtered <- comparison %>%
+  filter(country_name %in% c(
+    "Australia",
+    "Afghanistan",
+    "India",
+    "Indonesia",
+    "Malaysia",
+    "Pakistan"))
 ```
-
-# South Asia Analysis
-
-```{r southasia}
-
-ggplotly(
-  southasia %>%
-    ggplot(aes(
-      x = year,
-      y = score,
-      color = organisation
-    )) +
-    geom_line() +
-    geom_point() +
-    labs(title = "Wellbeing Economics in South Asia" , x = "Year", y = "Score") +
-    theme(legend.position = "bottom") +
-    theme_bw() +
-    facet_wrap( ~ country_name,
-                nrow = 4)
-)
-
-
-```
-
-# Middle-East Asia Analysis
-
-```{r middleeast}
-
-ggplotly(
-  westernasia %>%
-    ggplot(aes(
-      x = year,
-      y = score,
-      color = organisation
-    )) +
-    geom_line() +
-    geom_point() +
-    labs(title = "Wellbeing Economics in Middle-East Asia" , x = "Year", y = "Score") +
-    theme(legend.position = "bottom") +
-    theme_bw() +
-    facet_wrap(~ country_name,
-               ncol = 3)
-)
-
-```
-
-# East Asia Analysis
-
-```{r east}
-
-ggplotly(
-  easternasia %>%
-    ggplot(aes(
-      x = year,
-      y = score,
-      color = organisation
-    )) +
-    geom_line() +
-    geom_point() +
-    labs(title = "Wellbeing Economics in East Asia" , x = "Year", y = "Score") +
-    theme(legend.position = "bottom") +
-    theme_bw() +
-    facet_wrap( ~ country_name,
-                nrow = 4)
-)
-
-```
-
-# South-East Asia analysis
-
-```{r southeast}
-
-ggplotly(
-  seasia %>%
-    ggplot(aes(
-      x = year,
-      y = score,
-      color = organisation
-    )) +
-    geom_line() +
-    geom_point() +
-    labs(title = "Wellbeing Economics in South-East Asia" , x = "Year", y = "Score") +
-    theme(legend.position = "bottom") +
-    theme_bw() +
-    facet_wrap( ~ country_name,
-                ncol = 3)
-)
-
-```
-
-# Pacific Region Analysis
-
-```{r ausnz}
-
-ggplotly(
-  ausnz %>%
-    ggplot(aes(
-      x = year,
-      y = score,
-      color = organisation
-    )) +
-    geom_line() +
-    geom_point() +
-    labs(title = "Wellbeing Economics in Pacific Region" , x = "Year", y = "Score") +
-    theme(legend.position = "bottom") +
-    theme_bw() +
-    facet_wrap(~ country_name,
-               nrow = 4)
-)
-
-```
-
-
-# Happiness Score Factors Data
 
 ```{r}
 
-whrfactor <- import_list("data/healtheconomics/2015_a.xlsx" , rbind=TRUE)
-
-whrfactor <- whrfactor %>% 
-  select(-`_file`)
-
-whrfactor <- whrfactor %>% 
-  pivot_longer(
-    cols = 2:9,
-    names_to = "factor",
-    values_to = "value"
-  )
-
-
-```
-
-
-# Human Development Index Factors
-
-```{r}
-
-# Life Expectancy Data
-
-le <- read_excel("data/healtheconomics/le.xlsx")
-
-le <- le %>%
-  pivot_longer(cols = 4:35,
-               names_to = "year",
-               values_to = "life_expectancy")
-
-le <- le %>%
-  select(c(-hdicode)) %>%
-  mutate(year = str_remove_all(year, "le_")) %>%
-  mutate(year = as.numeric(year)) %>%
-  filter(year > 2014)
-
-
-# Gross National Income Per Capita
-
-gnipc <- read_excel("data/healtheconomics/gnipic.xlsx")
-
-gnipc <- gnipc %>%
-  pivot_longer(cols = 5:36,
-               names_to = "year",
-               values_to = "GNIPC")
-
-gnipc <- gnipc %>%
-  select(c(-hdicode)) %>%
-  mutate(year = str_remove_all(year, "gnipc_")) %>%
-  mutate(year = as.numeric(year)) %>%
-  filter(year > 2014)
-
-hdifactor <-
-  inner_join(le, gnipc, by = c("year", "country", "iso3"))
-
-
-# Expected years of Schooling
-
-eys <- read_excel("data/healtheconomics/eys.xlsx")
-
-eys <- eys %>%
-  pivot_longer(cols = 5:36,
-               names_to = "year",
-               values_to = "eys")
-
-eys <- eys %>%
-  mutate(year = str_remove_all(year, "eys_")) %>%
-  mutate(year = as.numeric(year)) %>%
-  select(c(-hdicode)) %>%
-  filter(year > 2014)
-
-hdifactor <-
-  inner_join(hdifactor, eys, by = c("year", "country", "iso3", "region"))
-
-
-# Mean Years of Schooling
-
-mys <- read_excel("data/healtheconomics/mys.xlsx")
-
-mys <- mys %>%
-  pivot_longer(cols = 5:36,
-               names_to = "year",
-               values_to = "mys")
-
-mys <- mys %>%
-  mutate(year = str_remove_all(year, "mys_")) %>%
-  mutate(year = as.numeric(year)) %>%
-  select(c(-hdicode)) %>%
-  filter(year > 2014)
-
-hdifactor <-
-  inner_join(hdifactor, mys, by = c("year", "country", "iso3", "region"))
-
-hdifactor <-
-  inner_join(hdifactor, hdi, by = c("year", "country", "iso3"))
-
-hdifactor <- hdifactor %>%
-  mutate(logGNI = log(GNIPC)) %>%
-  mutate(lifeexp = life_expectancy / 10) %>%
-  select(-region,-GNIPC,-life_expectancy)
-
-hdifactor <- hdifactor %>%
-  pivot_longer(cols = 4:8,
-               names_to = "factor",
-               values_to = "value")
-
-```
-
-# Comparison of HDI and WHR with contributing factors
-
-```{r}
-
-a <- ggplotly(
-  hdifactor %>% 
-    filter(country == 
-             'Indonesia') %>% 
-    ggplot(aes(x = year, 
-               y = value, 
-               color = factor)) +
-    geom_line() +
-    geom_point() +
-    theme_bw() +
-    scale_color_brewer(palette = "Dark2")
-)
-
-b <- ggplotly(
-  whrfactor %>% 
-    filter(country == 
-             'Indonesia') %>% 
-    ggplot(aes(x = year, 
-               y = value, 
-               color = factor)) +
-    geom_line() +
-    geom_point() +
-    theme_bw() +
-    scale_color_brewer(palette = "Dark2")
-)
-
-subplot(a,b)
-
-```
-
-
-# WHR Factors - Stacked Bar Chart
-
-```{r}
-
-whrfac <- whrfactor %>%
-  filter(factor != c("residual", "score"))
-
-indonesiawhr <- whrfac %>%
-  filter(country == "Pakistan")
-
-indonesiascore <- whrfactor %>%
-  filter(factor == "score", country == "Pakistan")
-
-ggplotly(
-  ggplot(indonesiawhr, aes(
-    fill = factor, x = year, y = value
-  )) +
-    scale_fill_brewer(palette = "Paired") +
-    geom_bar(position = "stack", stat = "identity") +
-    labs(title = "World Happiness Score : Factor composition") +
-    theme_bw() +
-    theme(legend.position = "top") +
-    geom_line(data = indonesiascore, aes(x = year, y = value)) +
-    geom_point(data = indonesiascore)
-)
-
-
-```
-
-
-# HDI vs WHR with life expectancy for Asia Pacific Region
-
-```{r}
-
-le2021 <-
-  merge(comparisonf,
-        le,
-        by.x = c("iso3", "year"),
-        by.y = c("iso3", "year")) %>%
-  filter(year == 2021)
-
-geo <- ne_countries(returnclass = "sf", scale = "medium") %>%
-  select(admin, iso_a3, subregion, region_wb)
-
-le2021 <- merge(le2021, geo, by.x = "iso3", by.y = "iso_a3")
-
-le2021 <- le2021 %>%
-  filter(
-    subregion %in% c(
-      "Southern Asia",
-      "Central Asia",
-      "Western Asia",
-      "Eastern Asia",
-      "South-Eastern Asia",
-      "Australia and New Zealand"
-    )
-  )
-
-ggplotly(
-  ggplot(
-    le2021,
-    aes(
-      x = HDI,
-      y = WHR,
-      size = life_expectancy,
-      color = subregion,
-      text = country_name
+country_comparison_plot <- ggplot(data = filtered,
+       aes(x = year,
+           y = score,
+           color = organisation)) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  scale_y_continuous(labels = scales::label_percent()) +
+  scale_color_manual(values = c(
+    "Human Development Index" = "#d73027",
+    "Life Ladder Score" = "#4575b4")) +
+  labs(
+    title = toupper("Measuring Wellbeing"),
+    subtitle = paste(
+      "The UN's **<span style=\"color:#d73027\">Human Development Index</span>** is a leading indicator for measuring a country’s progress",
+      "and includes life expectancy and income per capita. But the **<span style=\"color:#4575b4\">Life Ladder Score</span>**, measured by the",
+      "annual World Happiness Report, asks survey respondents to rate their lives.",
+      "It often tells a very different story.",
+      sep = "<br>"),
+    y = "Score",
+    caption = paste(
+      "**CHART:** Ambalika Gupta & James Goldie, 360info",
+      "**DATA:** UNDP & World Happiness Report",
+      sep = "<br>"
     )
   ) +
-    labs(title = "HDI vs WHR with life expectancy for Asia Pacific Region") +
-    geom_point(alpha = 0.5) +
-    scale_size(range = c(.1, 12), name = "Subregion") +
-    ylab("WHR") +
-    xlab("HDI") +
-    labs(title  = "Wellbeing") +
-    scale_y_continuous(labels = scales::label_percent(scale = 1)) +
-    scale_x_continuous(labels = scales::label_percent(scale = 1)) +
-    scale_color_brewer(palette = "Dark2")
-)
+  facet_wrap(~ country_name,
+               ncol = 2) +
+  theme_360() +
+  theme(
+    legend.position = "top",
+    legend.direction = "horizontal",
+    axis.title.x = element_blank(),
+    legend.title = element_blank(),
+    legend.key.width = unit(1, "cm"),
+    panel.background = element_rect(fill = "#fcfcfc", colour = NA),
+    panel.spacing.x = unit(1, "cm"),
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    strip.text = element_text(face = "bold"),
+    plot.margin = margin(0.5, 0.5, 1, 0.5, "cm"),
+    plot.subtitle = element_markdown(
+      family = "Body 360info", face = "plain", color = "black")
+  )
+
+save_360plot(country_comparison_plot,
+  file.path("out", "six-countries-comparison.png"),
+  shape = "sdtv-portrait")
 
 ```
+
+
+```{r india}
+
+# India
+
+india <- comparison %>%
+  filter(country_name == "India")
+
+ggplot(data = india,
+       aes(x = year,
+           y = score,
+           color = organisation)) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  scale_color_manual(values=c("#377EB7", "#EF3E30")) +
+  labs(
+    title = "Wellbeing Economics: India",
+    subtitle = "Comparing Human Development Index with World Happiness Score",
+    color = "Organisation",
+    x = "Year",
+    y = "Score",
+    caption = paste(
+      "**CHART:** Ambalika Gupta & James Goldie, 360info",
+      "**DATA:** UNDP & World Happiness Report",
+      sep = "\n"
+    )
+  ) +
+  theme_360() +
+  theme(
+    legend.position = "top",
+    legend.direction = "horizontal",
+    legend.key.width = unit(1, "cm") 
+  )
+
+```
+
+```{r paki}
+
+# Pakistan
+
+pakistan <- comparison %>%
+  filter(country_name == "Pakistan")
+
+ggplot(data = pakistan,
+       aes(x = year,
+           y = score,
+           color = organisation)) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  labs(
+    title = "Wellbeing Economics: Pakistan",
+    subtitle = "Comparing Human Development Index with World Happiness Score",
+    color = "Organisation",
+    x = "Year",
+    y = "Score",
+    caption = paste(
+      "**CHART:** Ambalika Gupta & James Goldie, 360info",
+      "**DATA:** UNDP & World Happiness Report",
+      sep = "\n"
+    )
+  ) +
+  theme_360() +
+  annotate_360_light(
+    x = 2017,
+    y = 0.52,
+    label = paste(
+      "Happiness score is more than ", 
+      "Human Development Index for 2019", 
+      sep = "<br>"
+    ),
+    size = 2
+  ) +
+  theme(
+    legend.position = "top",
+    legend.direction = "horizontal",
+    legend.key.width = unit(1, "cm") 
+  )
+
+```
+
+```{r indonesia}
+
+# Indonesia
+
+indonesia <- comparison %>%
+  filter(country_name == "Indonesia")
+
+ggplot(data = indonesia,
+       aes(x = year,
+           y = score,
+           color = organisation)) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  labs(
+    title = "Wellbeing Economics: Indonesia",
+    subtitle = "Comparing Human Development Index with World Happiness Score",
+    color = "Organisation",
+    x = "Year",
+    y = "Score",
+    caption = paste(
+      "**CHART:** Ambalika Gupta & James Goldie, 360info",
+      "**DATA:** UNDP & World Happiness Report",
+      sep = "\n"
+    )
+  ) +
+  theme_360() +
+  theme(
+    legend.position = "top",
+    legend.direction = "horizontal",
+    legend.key.width = unit(1, "cm") 
+  )
+
+```
+
+```{r thai}
+
+# Thailand
+
+thailand <- comparison %>%
+  filter(country_name == "Thailand")
+
+ggplot(data = thailand,
+       aes(x = year,
+           y = score,
+           color = organisation)) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  labs(
+    title = "Wellbeing Economics: Thailand",
+    subtitle = "Comparing Human Development Index with World Happiness Score",
+    color = "Organisation",
+    x = "Year",
+    y = "Score",
+    caption = paste(
+      "**CHART:** Ambalika Gupta & James Goldie, 360info",
+      "**DATA:** UNDP & World Happiness Report",
+      sep = "\n"
+    )
+  ) +
+  theme_360() +
+  theme(
+    legend.position = "top",
+    legend.direction = "horizontal",
+    legend.key.width = unit(1, "cm") 
+  )
+
+```
+
+```{r sgp}
+
+# Singapore
+
+singapore <- comparison %>%
+  filter(country_name == "Singapore")
+
+ggplot(data = singapore,
+       aes(x = year,
+           y = score,
+           color = organisation)) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  labs(
+    title = "Wellbeing Economics: Singapore",
+    subtitle = "Comparing Human Development Index with World Happiness Score",
+    color = "Organisation",
+    x = "Year",
+    y = "Score",
+    caption = paste(
+      "**CHART:** Ambalika Gupta & James Goldie, 360info",
+      "**DATA:** UNDP & World Happiness Report",
+      sep = "\n"
+    )
+  ) +
+  theme_360() +
+  theme(
+    legend.position = "top",
+    legend.direction = "horizontal",
+    legend.key.width = unit(1, "cm") 
+  )
+
+```
+
+```{r myanmar}
+
+# Myanmar
+
+myanmar <- comparison %>%
+  filter(country_name == "Myanmar")
+
+ggplot(data = myanmar,
+       aes(x = year,
+           y = score,
+           color = organisation)) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  labs(
+    title = "Wellbeing Economics: Myanmar",
+    subtitle = "Comparing Human Development Index with World Happiness Score",
+    color = "Organisation",
+    x = "Year",
+    y = "Score",
+    caption = paste(
+      "**CHART:** Ambalika Gupta & James Goldie, 360info",
+      "**DATA:** UNDP & World Happiness Report",
+      sep = "\n"
+    )
+  ) +
+  theme_360() +
+  theme(
+    legend.position = "top",
+    legend.direction = "horizontal",
+    legend.key.width = unit(1, "cm") 
+  )
+```
+
+```{r aus}
+
+# Australia
+
+aus <- comparison %>%
+  filter(country_name == "Australia")
+
+ggplot(data = aus,
+       aes(x = year,
+           y = score,
+           color = organisation)) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  labs(
+    title = "Wellbeing Economics: Australia",
+    subtitle = "Comparing Human Development Index with World Happiness Score",
+    color = "Organisation",
+    x = "Year",
+    y = "Score",
+    caption = paste(
+      "**CHART:** Ambalika Gupta & James Goldie, 360info",
+      "**DATA:** UNDP & World Happiness Report",
+      sep = "\n"
+    )
+  ) +
+  theme_360() +
+  theme(
+    legend.position = "top",
+    legend.direction = "horizontal",
+    legend.key.width = unit(1, "cm")
+    ) 
+
+```
+
+
+```{r nz}
+
+# New Zealand
+
+nz <- comparison %>%
+  filter(country_name == "New Zealand")
+
+ggplot(data = nz,
+       aes(x = year,
+           y = score,
+           color = organisation)) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  labs(
+    title = "Wellbeing Economics: New Zealand",
+    subtitle = "Comparing Human Development Index with World Happiness Score",
+    color = "Organisation",
+    x = "Year",
+    y = "Score",
+    caption = paste(
+      "**CHART:** Ambalika Gupta & James Goldie, 360info",
+      "**DATA:** UNDP & World Happiness Report",
+      sep = "\n"
+    )
+  ) +
+  theme_360() +
+  theme(
+    legend.position = "top",
+    legend.direction = "horizontal",
+    legend.key.width = unit(1, "cm")
+  )
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

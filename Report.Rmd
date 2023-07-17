@@ -282,6 +282,7 @@ ggplotly(rate_map)
 
 
 **Observations:**
+
 + We can observe most African countries have some of the highest rates of child marriages with countries like Chad, and Niger displaying the highest rate followed by Sudan, Mozambique, Nigeria, etc.
 + Among Asian countries, Bangladesh has the highest child marriage rate.
 
@@ -676,7 +677,7 @@ The economics of well-being is a strong tool for future policymakers to design p
 
 #### Human Development Index
 
-While *HDI* takes into account other factors of well being like income, health and wealth, it has certain limitations:
+While **HDI** takes into account other factors of well being like income, health and wealth, it has certain limitations:
 
 + It does not take into account other factors of social welfare like freedom, generosity, gender inequality, etc.
 + It is more quantitative than qualitative. It may not necessarily address the nuances of human development like human rights and quality of life rather than life expectancy.
