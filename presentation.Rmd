@@ -165,7 +165,7 @@ combined_map <- ggplot() +
     plot.margin = margin()
   )
   
-save_360plot(combined_map, "combined_map.png", retina = 4,
+save_360plot(combined_map, file.path("images", "combined_map.png"), retina = 4,
   shape = "sdtv-landscape")
 
 ```
@@ -174,7 +174,7 @@ save_360plot(combined_map, "combined_map.png", retina = 4,
 Due to Covid-19 about **9 million** more girls were at risk of child marriage.
 .right-column[
 ```{r echo = FALSE, fig.align="center", warning=FALSE, message=FALSE, echo=FALSE, out.height="450px", out.width="680px"}
-knitr::include_graphics("combined_map.png")
+knitr::include_graphics(file.path("images", "combined_map.png"))
 ```
 
 ]
@@ -291,7 +291,7 @@ wellbeing <-
   geom_line(data = indonesiascore, aes(x = year, y = value)) +
   geom_point(data = indonesiascore)
 
-save_360plot(wellbeing, "happiness.png", shape = "sdtv-landscape")
+save_360plot(wellbeing, file.path("images", "happiness.png"), shape = "sdtv-landscape")
 ```
 
 ```{r include=FALSE}
@@ -390,7 +390,7 @@ country_comparison_plot <- ggplot(data = filtered,
       family = "Body 360info", face = "plain", color = "black")
   )
 
-save_360plot(country_comparison_plot, "wellbeing.png", shape = "sdtv-landscape")
+save_360plot(country_comparison_plot, file.path("images", "wellbeing.png"), shape = "sdtv-landscape")
 
 ```
 
@@ -402,7 +402,7 @@ Progress of an economy cannot only be captured in terms of GDP, but should also 
 
 ```{r echo = FALSE, fig.align="center", warning=FALSE, message=FALSE, echo=FALSE, out.height="435px", out.width="625px"}
 
-knitr::include_graphics("happiness.png")
+knitr::include_graphics(file.path("images", "happiness.png"))
 
 ```
 
@@ -412,7 +412,7 @@ knitr::include_graphics("happiness.png")
 
 ```{r echo = FALSE, fig.align="center", warning=FALSE, message=FALSE, echo=FALSE, out.height="425px", out.width="625px"}
 
-knitr::include_graphics("wellbeing.png")
+knitr::include_graphics(file.path("images", "wellbeing.png"))
 
 ```
 
@@ -431,7 +431,7 @@ class: center, middle
 
 ```{r echo = FALSE, fig.align="center", warning=FALSE, message=FALSE, echo=FALSE, out.height="400px", out.width="500px"}
 
-knitr::include_graphics("minion.jpg")
+knitr::include_graphics(file.path("images", "minion.jpg"))
 
 ```
 
