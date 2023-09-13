@@ -24,15 +24,15 @@ Data in these charts comes from:
 
 [Human Development Index](https://hdr.undp.org/data-center/human-development-index#/indicies/HDI)
 
-Minimum Age of Child Marriage Rate : [United Nations](https://gender-data-hub-2-undesa.hub.arcgis.com/datasets/8ba8255a4ba047fcb0e6dbe8041a0eb0/explore)
+Minimum Age of Child Marriage Rate: [United Nations](https://gender-data-hub-2-undesa.hub.arcgis.com/datasets/8ba8255a4ba047fcb0e6dbe8041a0eb0/explore)
 
-Covid-19 Stringency : [Our World in Data](https://ourworldindata.org/metrics-explained-covid19-stringency-index)
+Covid-19 Stringency: [Our World in Data](https://ourworldindata.org/metrics-explained-covid19-stringency-index)
 
-Laws on Child Marriage : [Our World in Data](https://ourworldindata.org/grapher/laws-on-child-marriage)
+Laws on Child Marriage: [Our World in Data](https://ourworldindata.org/grapher/laws-on-child-marriage)
 
-Child Marriage Rate from 2005 - 2021 : [UN DESA Statistics Division](https://unstats-undesa.opendata.arcgis.com/datasets/undesa::indicator-5-3-1-proportion-of-women-aged-20-24-years-who-were-married-or-in-a-union-before-age-18-percent/explore?location=2.960853%2C1.735981%2C2.67)
+Child Marriage Rate from 2005–2021: [UN DESA Statistics Division](https://unstats-undesa.opendata.arcgis.com/datasets/undesa::indicator-5-3-1-proportion-of-women-aged-20-24-years-who-were-married-or-in-a-union-before-age-18-percent/explore?location=2.960853%2C1.735981%2C2.67)
 
-Child Marriage Rate during Covid-19 : [UNICEF Data](https://data.unicef.org/resources/data_explorer/unicef_f/?ag=UNICEF&df=GLOBAL_DATAFLOW&ver=1.0&dq=.PT_F_20-24_MRD_U15+PT_F_20-24_MRD_U18+PT_F_15-19_MRD..&startPeriod=2016&endPeriod=2022)
+Child Marriage Rate during Covid-19: [UNICEF Data](https://data.unicef.org/resources/data_explorer/unicef_f/?ag=UNICEF&df=GLOBAL_DATAFLOW&ver=1.0&dq=.PT_F_20-24_MRD_U15+PT_F_20-24_MRD_U18+PT_F_15-19_MRD..&startPeriod=2016&endPeriod=2022)
 
 **Please attribute 360info and the data sources when you use and remix these visualisations.**
 
@@ -42,15 +42,14 @@ Child Marriage Rate during Covid-19 : [UNICEF Data](https://data.unicef.org/reso
 
 To setup a development environment manually, you'll need to:
 
-- [Download and install Quarto](https://quarto.org/docs/get-started)
 - [Download the install R](https://www.r-project.org)
 - Satisfy the R package dependencies. In R:
   * Install the [`renv`](https://rstudio.github.io/renv) package with `install.packages("renv")`,
   * Then run `renv::restore()` to install the R package dependencies.
   * (For problems satisfying R package dependencies, refer to [Quarto's documentation on virtual environments](https://quarto.org/docs/projects/virtual-environments.html).)
 
-Now, render the `.qmd` files to the `/out` directory with:
+Now, render the `.rmd` files in R with (for example):
 
-```sh
-quarto render
+```r
+rmarkdown::render("Report.Rmd")
 ```
